@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amol Jadhav | IISc Research Scholar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Animated background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="a" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="white" stop-opacity="0.1"/><stop offset="100%" stop-color="white" stop-opacity="0"/></radialGradient></defs><circle cx="10" cy="10" r="2" fill="url(%23a)" opacity="0.8"><animate attributeName="cy" values="10;90;10" dur="20s" repeatCount="indefinite"/></circle><circle cx="30" cy="30" r="1.5" fill="url(%23a)" opacity="0.6"><animate attributeName="cx" values="30;70;30" dur="15s" repeatCount="indefinite"/></circle><circle cx="70" cy="70" r="2.5" fill="url(%23a)" opacity="0.7"><animate attributeName="cy" values="70;20;70" dur="25s" repeatCount="indefinite"/></circle><circle cx="90" cy="40" r="1.8" fill="url(%23a)" opacity="0.5"><animate attributeName="cx" values="90;10;90" dur="18s" repeatCount="indefinite"/></circle></svg>') repeat;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #667eea;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 0 2rem;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+            to { text-shadow: 0 0 30px rgba(255,255,255,0.8); }
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-primary:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-3px);
+        }
+
+        /* Sections */
+        .section {
+            padding: 100px 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        /* About Section */
+        .about {
+            background: white;
+            border-radius: 20px;
+            padding: 80px 60px;
+            margin: 50px 0;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .profile-image {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+            margin: 0 auto;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        }
+
+        /* Education Section */
+        .education-item {
+            background: white;
+            padding: 2rem;
+            margin: 1rem 0;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            border-left: 5px solid #667eea;
+        }
+
+        .education-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+
+        /* Research Papers Section */
+        .research-papers {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin: 50px 0;
+        }
+
+        .paper-item {
+            background: white;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+            border-left: 4px solid #764ba2;
+            transition: all 0.3s ease;
+        }
+
+        .paper-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        /* Q&A Section */
+        .qa-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin: 50px 0;
+        }
+
+        .question-form {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.9);
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .questions-list {
+            margin-top: 3rem;
+        }
+
+        .question-item {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .question-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        /* Contact Section */
+        .contact {
+            background: #333;
+            color: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin: 50px 0;
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .social-link {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            transform: translateY(-5px) rotate(360deg);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        /* More Section */
+        .more-section {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin: 50px 0;
+            text-align: center;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .hero p { font-size: 1.1rem; }
+            .about-content { grid-template-columns: 1fr; text-align: center; }
+            .nav-links { display: none; }
+            .projects-grid { grid-template-columns: 1fr; }
+            .cta-buttons { flex-direction: column; }
+        }
+
+        /* Success message */
+        .success-message {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 1rem 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo">Amol Jadhav</a>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#education">Education</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#research">Research</a></li>
+                <li><a href="#qa">Q&A</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Amol Jadhav</h1>
+            <p>MTech Research Scholar at Indian Institute of Science, Bengaluru<br>
+               Specializing in Database Systems & Computer Science Research</p>
+            <div class="cta-buttons">
+                <a href="#about" class="btn btn-primary">Explore My Work</a>
+                <a href="#contact" class="btn btn-secondary">Get In Touch</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="about animate-on-scroll">
+            <h2 class="section-title">About Me</h2>
+            <div class="about-content">
+                <div class="profile-image">AJ</div>
+                <div>
+                    <p style="font-size: 1.2rem; line-height: 1.8; margin-bottom: 1.5rem;">
+                        Welcome! I'm Amol Jadhav, a passionate researcher and developer currently pursuing my MTech (Research) in Computer Science and Engineering at the prestigious Indian Institute of Science, Bengaluru.
+                    </p>
+                    <p style="font-size: 1.1rem; line-height: 1.7; margin-bottom: 1.5rem;">
+                        My journey in technology is driven by a deep fascination with database systems, where I've contributed to groundbreaking projects like ShaktiDb - India's indigenous database system. With expertise spanning across C/C++, PostgreSQL, Python, and system design, I'm committed to pushing the boundaries of what's possible in computer science.
+                    </p>
+                    <p style="font-size: 1.1rem; line-height: 1.7;">
+                        Beyond research, I'm passionate about problem-solving, achieving milestones like securing AIR 747 in GATE CSE 2025 and maintaining a typing speed of 100 WPM. I believe in the power of technology to transform lives and am dedicated to contributing meaningful innovations to the field.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education" class="section">
+        <h2 class="section-title">Education</h2>
+        <div class="animate-on-scroll">
+            <div class="education-item">
+                <h3 style="color: #667eea; font-size: 1.4rem; margin-bottom: 0.5rem;">MTech (Research) in Computer Science and Engineering</h3>
+                <h4 style="color: #666; font-size: 1.2rem; margin-bottom: 0.5rem;">Indian Institute of Science, Bengaluru, Karnataka</h4>
+                <p style="color: #888; font-size: 1rem; margin-bottom: 1rem;">Current</p>
+                <p style="line-height: 1.6;">
+                    Pursuing advanced research in Computer Science with a focus on database systems, algorithms, and system design. 
+                    Engaged in cutting-edge research projects and contributing to India's indigenous database development initiatives.
+                </p>
+            </div>
+            
+            <div class="education-item">
+                <h3 style="color: #667eea; font-size: 1.4rem; margin-bottom: 0.5rem;">BTech in Computer Science and Engineering</h3>
+                <h4 style="color: #666; font-size: 1.2rem; margin-bottom: 0.5rem;">SVERI's College of Engineering, Pandharpur, Maharashtra</h4>
+                <p style="color: #888; font-size: 1rem; margin-bottom: 1rem;">Dec 2021 - Dec 2025</p>
+                <p style="line-height: 1.6;">
+                    Comprehensive foundation in computer science principles, data structures, algorithms, operating systems, 
+                    database management, and software engineering. Developed strong analytical and problem-solving skills.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+        <h2 class="section-title">Featured Projects</h2>
+        <div class="projects-grid animate-on-scroll">
+            <div class="project-card">
+                <h3 style="color: #667eea; font-size: 1.5rem; margin-bottom: 1rem;">ShaktiDb</h3>
+                <p style="color: #666; margin-bottom: 1rem;"><strong>Technologies:</strong> C, C++, Shell, PostgreSQL</p>
+                <p style="line-height: 1.6; margin-bottom: 1.5rem;">
+                    Contributing to the development of India's indigenous database system under IITM Pravartak mentorship. 
+                    Building robust database architecture on top of PostgreSQL and enhancing tools for large-scale database optimization.
+                </p>
+                <a href="#" class="btn btn-primary" style="font-size: 0.9rem; padding: 10px 20px;">View Project</a>
+            </div>
+            
+            <div class="project-card">
+                <h3 style="color: #667eea; font-size: 1.5rem; margin-bottom: 1rem;">Automatic CSV Data Management System</h3>
+                <p style="color: #666; margin-bottom: 1rem;"><strong>Technologies:</strong> Python, PostgreSQL, Shell, C, C++</p>
+                <p style="line-height: 1.6; margin-bottom: 1.5rem;">
+                    Designed and implemented an automated system for CSV data ingestion, cleaning, and storage. Features include 
+                    bulk processing, duplicate removal, format validation, error logging, and automated email reports.
+                </p>
+                <a href="#" class="btn btn-primary" style="font-size: 0.9rem; padding: 10px 20px;">View Project</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Papers Section -->
+    <section id="research" class="section">
+        <div class="research-papers animate-on-scroll">
+            <h2 class="section-title">Research Papers</h2>
+            <div style="text-align: center; color: #666; font-size: 1.1rem; margin: 2rem 0;">
+                <p>Research publications and papers will be updated here as they become available.</p>
+                <p style="margin-top: 1rem; font-style: italic;">Stay tuned for upcoming research contributions in database systems and computer science!</p>
+            </div>
+            
+            <!-- Placeholder for future papers -->
+            <div class="paper-item" style="opacity: 0.7;">
+                <h4 style="color: #764ba2; margin-bottom: 0.5rem;">Upcoming Research Work</h4>
+                <p style="color: #666;">Research papers and publications will be added here as they are completed and published.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Q&A Section -->
+    <section id="qa" class="section">
+        <div class="qa-section animate-on-scroll">
+            <h2 class="section-title" style="color: white;">Ask Me Anything</h2>
+            <p style="text-align: center; font-size: 1.1rem; margin-bottom: 2rem;">
+                Have questions about my research, projects, or academic journey? Feel free to ask!
+            </p>
+            
+            <div class="question-form">
+                <form id="questionForm">
+                    <div class="form-group">
+                        <label for="userName">Your Name:</label>
+                        <input type="text" id="userName" name="userName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userEmail">Your Email:</label>
+                        <input type="email" id="userEmail" name="userEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="question">Your Question:</label>
+                        <textarea id="question" name="question" placeholder="Ask me anything about my research, projects, or academic journey..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Question</button>
+                </form>
+                <div id="successMessage" class="success-message">
+                    Your question has been submitted successfully! I'll get back to you soon.
+                </div>
+            </div>
+
+            <!-- Questions will be loaded from Firebase -->
+            <div class="questions-list">
+                <h3 style="margin-bottom: 1.5rem;">Recent Questions</h3>
+                <div id="questionsContainer">
+                    <p style="text-align: center; opacity: 0.8;">No questions yet. Be the first to ask!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- More Section -->
+    <section id="more" class="section">
+        <div class="more-section animate-on-scroll">
+            <h2 class="section-title" style="color: white;">More Coming Soon</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem;">
+                This section will be continuously updated with new content, achievements, and exciting developments in my academic and research journey.
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 3rem;">
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 2rem;">
+                    <h4 style="margin-bottom: 1rem;">🏆 Achievements</h4>
+                    <p>Awards, recognitions, and milestones will be featured here.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 2rem;">
+                    <h4 style="margin-bottom: 1rem;">📚 Learning</h4>
+                    <p>Courses, certifications, and new skills I'm acquiring.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 2rem;">
+                    <h4 style="margin-bottom: 1rem;">🤝 Collaborations</h4>
+                    <p>Research collaborations and academic partnerships.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="contact animate-on-scroll">
+            <h2 class="section-title" style="color: white;">Get In Touch</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem;">
+                I'm always open to discussing research opportunities, collaborations, or just having a conversation about technology and innovation.
+            </p>
+            
+            <div style="margin: 2rem 0;">
+                <p style="font-size: 1.1rem; margin-bottom: 1rem;">
+                    📧 Email: <a href="mailto:amoljadhav@iisc.ac.in" style="color: #4facfe; text-decoration: none;">amoljadhav@iisc.ac.in</a>
+                </p>
+                <p style="font-size: 1.1rem;">
+                    📱 Phone: <a href="tel:+917020156364" style="color: #4facfe; text-decoration: none;">+91 7020156364</a>
+                </p>
+            </div>
+
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/amol-jadhav-098773254/" class="social-link" title="LinkedIn">
+                    💼
+                </a>
+                <a href="https://github.com/AmolJadhav37" class="social-link" title="GitHub">
+                    🐱
+                </a>
+                <a href="mailto:amoljadhav@iisc.ac.in" class="social-link" title="Email">
+                    ✉️
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Firebase Configuration -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAhw6BGox0iSJe24oqk4uzJKTWkfatVppw",
+            authDomain: "amoljadhav-iisc.firebaseapp.com",
+            projectId: "amoljadhav-iisc",
+            storageBucket: "amoljadhav-iisc.firebasestorage.app",
+            messagingSenderId: "862590830571",
+            appId: "1:862590830571:web:9ac4acc06d986fe318fbae",
+            measurementId: "G-GZC0JQEYTW"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // Handle question form submission
+        document.getElementById('questionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Submitting...';
+            submitButton.disabled = true;
+            
+            const userName = document.getElementById('userName').value.trim();
+            const userEmail = document.getElementById('userEmail').value.trim();
+            const question = document.getElementById('question').value.trim();
+            
+            if (!userName || !userEmail || !question) {
+                alert('Please fill in all fields');
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+                return;
+            }
+            
+            try {
+                console.log('Attempting to add question to Firebase...');
+                
+                // Add question to Firestore
+                const docRef = await addDoc(collection(db, 'questions'), {
+                    name: userName,
+                    email: userEmail,
+                    question: question,
+                    timestamp: new Date(),
+                    upvotes: 0,
+                    comments: [],
+                    answered: false,
+                    flagged: false
+                });
+                
+                console.log('Question added with ID: ', docRef.id);
+                
+                // Show success message
+                const successMsg = document.getElementById('successMessage');
+                successMsg.style.display = 'block';
+                document.getElementById('questionForm').reset();
+                
+                // Reload questions
+                await loadQuestions();
+                
+                // Hide success message after 5 seconds
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 5000);
+                
+            } catch (error) {
+                console.error('Error adding question: ', error);
+                alert('Error submitting question: ' + error.message);
+            } finally {
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            }
+        });
+
+        // Function to upvote a question
+        window.upvoteQuestion = async function(questionId) {
+            try {
+                const questionRef = doc(db, 'questions', questionId);
+                const questionSnap = await getDoc(questionRef);
+                
+                if (questionSnap.exists()) {
+                    const currentUpvotes = questionSnap.data().upvotes || 0;
+                    await updateDoc(questionRef, {
+                        upvotes: currentUpvotes + 1
+                    });
+                    
+                    // Reload questions to show updated count
+                    await loadQuestions();
+                }
+            } catch (error) {
+                console.error('Error upvoting question: ', error);
+                alert('Error upvoting question. Please try again.');
+            }
+        };
+
+        // Load questions from database
+        async function loadQuestions() {
+            try {
+                console.log('Loading questions from Firebase...');
+                
+                const q = query(collection(db, 'questions'), orderBy('timestamp', 'desc'), limit(10));
+                const querySnapshot = await getDocs(q);
+                
+                const questionsContainer = document.getElementById('questionsContainer');
+                
+                if (querySnapshot.empty) {
+                    questionsContainer.innerHTML = '<p style="text-align: center; opacity: 0.8;">No questions yet. Be the first to ask!</p>';
+                    return;
+                }
+                
+                let questionsHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const date = data.timestamp?.toDate?.() || new Date();
+                    
+                    questionsHTML += `
+                        <div class="question-item">
+                            <h4 style="margin-bottom: 0.5rem;">${escapeHtml(data.question)}</h4>
+                            <p style="opacity: 0.9; margin-bottom: 0.5rem;">Posted by: ${escapeHtml(data.name)}</p>
+                            <p style="opacity: 0.7; font-size: 0.9rem; margin-bottom: 1rem;">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</p>
+                            <div class="question-actions">
+                                <button class="action-btn" onclick="upvoteQuestion('${doc.id}')">👍 Upvote (${data.upvotes || 0})</button>
+                                <button class="action-btn">💬 Comment</button>
+                                <button class="action-btn">🚩 Flag</button>
+                                <button class="action-btn">💡 Answer</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                questionsContainer.innerHTML = questionsHTML;
+                console.log('Questions loaded successfully');
+                
+            } catch (error) {
+                console.error('Error loading questions: ', error);
+                document.getElementById('questionsContainer').innerHTML = 
+                    '<p style="text-align: center; opacity: 0.8; color: #ff6b6b;">Error loading questions. Please refresh the page.</p>';
+            }
+        }
+
+        // Utility function to escape HTML
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        // Load questions when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Page loaded, initializing Firebase...');
+            
+            // Test Firebase connection
+            try {
+                console.log('Firebase app initialized:', app);
+                console.log('Firestore initialized:', db);
+                loadQuestions();
+            } catch (error) {
+                console.error('Firebase initialization error:', error);
+            }
+        });
+    </script>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Animate elements on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all elements with animate-on-scroll class
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Update navbar background on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.style.background = 'rgba(255, 255, 255, 0.98)';
+                nav.style.boxShadow = '0 2px 30px rgba(0,0,0,0.15)';
+            } else {
+                nav.style.background = 'rgba(255, 255, 255, 0.95)';
+                nav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.1)';
+            }
+        });
+
+        // Add typing animation to hero text
+        function typeWriter(element, text, speed = 50) {
+            let i = 0;
+            element.innerHTML = '';
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Initialize typing animation when page loads
+        window.addEventListener('load', () => {
+            const heroTitle = document.querySelector('.hero h1');
+            const originalText = heroTitle.textContent;
+            setTimeout(() => {
+                typeWriter(heroTitle, originalText, 100);
+            }, 500);
+        });
+
+        // Add parallax effect to background
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelector('.animated-bg');
+            const speed = scrolled * 0.5;
+            parallax.style.transform = `translateY(${speed}px)`;
+        });
+
+        // Add hover effects to project cards
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-15px) rotateX(5deg)';
+                card.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0) rotateX(0)';
+            });
+        });
+
+        // Add click ripple effect to buttons
+        document.querySelectorAll('.btn, .action-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                let ripple = document.createElement('span');
+                let rect = this.getBoundingClientRect();
+                let size = Math.max(rect.width, rect.height);
+                let x = e.clientX - rect.left - size / 2;
+                let y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgba(255,255,255,0.5);
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    pointer-events: none;
+                `;
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Add CSS for ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Mobile menu toggle (if needed in future)
+        function createMobileMenu() {
+            const nav = document.querySelector('.nav-container');
+            const mobileMenuBtn = document.createElement('button');
+            mobileMenuBtn.innerHTML = '☰';
+            mobileMenuBtn.style.cssText = `
+                display: none;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: #333;
+            `;
+            
+            // Add mobile styles
+            const mobileStyles = `
+                @media (max-width: 768px) {
+                    .mobile-menu-btn { display: block !important; }
+                    .nav-links { 
+                        display: none;
+                        position: absolute;
+                        top: 100%;
+                        left: 0;
+                        width: 100%;
+                        background: white;
+                        flex-direction: column;
+                        padding: 1rem 0;
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                    }
+                    .nav-links.active { display: flex; }
+                }
+            `;
+            
+            const mobileStyleSheet = document.createElement('style');
+            mobileStyleSheet.textContent = mobileStyles;
+            document.head.appendChild(mobileStyleSheet);
+            
+            mobileMenuBtn.className = 'mobile-menu-btn';
+            mobileMenuBtn.addEventListener('click', () => {
+                document.querySelector('.nav-links').classList.toggle('active');
+            });
+            
+            nav.appendChild(mobileMenuBtn);
+        }
+
+        // Initialize mobile menu
+        createMobileMenu();
+
+        // Add loading animation
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
