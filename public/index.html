@@ -919,6 +919,18 @@
                 font-size: 0.9rem;
             }
         }
+
+        /* Find this existing rule */
+        #authModal .btn {
+            display: block !important;
+            visibility: visible !important;
+            width: 100%;
+            margin-top: 1rem;
+
+            /* ADD THIS LINE */
+            color: #333;
+            /* This sets the text color to dark gray */
+        }
     </style>
 </head>
 
@@ -969,7 +981,7 @@
                         <label for="loginPassword">Password:</label>
                         <input type="password" id="loginPassword" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <button type="submit" class="btn btn-primary">login</button>
                 </form>
             </div>
 
