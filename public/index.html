@@ -920,17 +920,16 @@
             }
         }
 
-        /* Find this existing rule */
-        #authModal .btn {
-            display: block !important;
-            visibility: visible !important;
-            width: 100%;
-            margin-top: 1rem;
-
-            /* ADD THIS LINE */
-            color: #333;
-            /* This sets the text color to dark gray */
-        }
+       /* Find this existing rule */
+#authModal .btn {
+    display: block !important;
+    visibility: visible !important;
+    width: 100%;
+    margin-top: 1rem;
+    
+    /* ADD THIS LINE */
+    color: #333; /* This sets the text color to dark gray */
+}
     </style>
 </head>
 
@@ -981,7 +980,7 @@
                         <label for="loginPassword">Password:</label>
                         <input type="password" id="loginPassword" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">login</button>
+                    <button type="submit" class="btn btn-primary">Login</button>
                 </form>
             </div>
 
@@ -1271,62 +1270,75 @@
     </section>
 
     <!-- Firebase Configuration -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
-        import {
-            getFirestore,
-            collection,
-            addDoc,
-            getDocs,
-            query,
-            orderBy,
-            limit,
-            doc,
-            getDoc,
-            updateDoc,
-            deleteDoc,
-            arrayUnion,
-            serverTimestamp,
-            where
-        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-        import {
-            getAuth,
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword,
-            signOut,
-            onAuthStateChanged,
-            updateProfile
-        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+    <!-- Replace the entire Firebase script section with this -->
+// FIXED FIREBASE SCRIPT - Replace the entire Firebase script section with this
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
+    import {
+        getFirestore,
+        collection,
+        addDoc,
+        getDocs,
+        query,
+        orderBy,
+        doc,
+        getDoc,
+        updateDoc,
+        deleteDoc,
+        arrayUnion,
+        serverTimestamp,
+        Timestamp
+    } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    import {
+        getAuth,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        signOut,
+        onAuthStateChanged,
+        updateProfile
+    } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAhw6BGox0iSJe24oqk4uzJKTWkfatVppw",
-            authDomain: "amoljadhav-iisc.firebaseapp.com",
-            projectId: "amoljadhav-iisc",
-            storageBucket: "amoljadhav-iisc.firebasestorage.app",
-            messagingSenderId: "862590830571",
-            appId: "1:862590830571:web:9ac4acc06d986fe318fbae",
-            measurementId: "G-GZC0JQEYTW"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyAhw6BGox0iSJe24oqk4uzJKTWkfatVppw",
+        authDomain: "amoljadhav-iisc.firebaseapp.com",
+        projectId: "amoljadhav-iisc",
+        storageBucket: "amoljadhav-iisc.firebasestorage.app",
+        messagingSenderId: "862590830571",
+        appId: "1:862590830571:web:9ac4acc06d986fe318fbae",
+        measurementId: "G-GZC0JQEYTW"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-        let currentUser = null;
+    // Global variables
+    let currentUser = null;
+    let allQuestions = [];
+    let visibleQuestions = 4;
+    const QUESTIONS_PER_LOAD = 4;
+    let isLoadingQuestions = false;
 
-        // Auth state observer
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            updateAuthUI(user);
-            if (user) {
+    // Auth state observer - FIXED
+    onAuthStateChanged(auth, (user) => {
+        console.log('Auth state changed:', user ? user.email : 'No user');
+        currentUser = user;
+        updateAuthUI(user);
+        
+        // Load questions with a small delay to ensure UI updates are complete
+        if (!isLoadingQuestions) {
+            setTimeout(() => {
                 loadQuestions();
-            }
-        });
+            }, 200);
+        }
+    });
 
-        // Update UI based on auth state
-        function updateAuthUI(user) {
+    // Update UI based on auth state
+    function updateAuthUI(user) {
+        try {
             const loginBtn = document.getElementById('loginBtn');
             const signupBtn = document.getElementById('signupBtn');
             const userInfo = document.getElementById('userInfo');
@@ -1337,147 +1349,213 @@
             const qaAuthenticated = document.getElementById('qaAuthenticated');
 
             if (user) {
-                loginBtn.style.display = 'none';
-                signupBtn.style.display = 'none';
-                userInfo.style.display = 'flex';
-                userName.textContent = `Welcome, ${user.displayName || user.email.split('@')[0]}!`;
+                // User is logged in
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (signupBtn) signupBtn.style.display = 'none';
+                if (userInfo) userInfo.style.display = 'flex';
+                if (userName) userName.textContent = `Welcome, ${user.displayName || user.email.split('@')[0]}!`;
 
                 // Show authenticated content
-                studyMaterialsContent.style.display = 'none';
-                studyMaterialsAuth.style.display = 'block';
-                qaAuthRequired.style.display = 'none';
-                qaAuthenticated.style.display = 'block';
+                if (studyMaterialsContent) studyMaterialsContent.style.display = 'none';
+                if (studyMaterialsAuth) studyMaterialsAuth.style.display = 'block';
+                if (qaAuthRequired) qaAuthRequired.style.display = 'none';
+                if (qaAuthenticated) qaAuthenticated.style.display = 'block';
             } else {
-                loginBtn.style.display = 'block';
-                signupBtn.style.display = 'block';
-                userInfo.style.display = 'none';
+                // User is not logged in
+                if (loginBtn) loginBtn.style.display = 'block';
+                if (signupBtn) signupBtn.style.display = 'block';
+                if (userInfo) userInfo.style.display = 'none';
 
                 // Show auth required content
-                studyMaterialsContent.style.display = 'block';
-                studyMaterialsAuth.style.display = 'none';
-                qaAuthRequired.style.display = 'block';
-                qaAuthenticated.style.display = 'none';
+                if (studyMaterialsContent) studyMaterialsContent.style.display = 'block';
+                if (studyMaterialsAuth) studyMaterialsAuth.style.display = 'none';
+                if (qaAuthRequired) qaAuthRequired.style.display = 'block';
+                if (qaAuthenticated) qaAuthenticated.style.display = 'none';
             }
+        } catch (error) {
+            console.error('Error updating auth UI:', error);
         }
+    }
 
-        // Modal functions
-        window.openAuthModal = function (tab = 'login') {
-            document.getElementById('authModal').style.display = 'block';
+    // MODAL FUNCTIONS
+    window.openAuthModal = function (tab = 'login') {
+        const modal = document.getElementById('authModal');
+        if (modal) {
+            modal.style.display = 'block';
             switchAuthTab(tab);
-        };
-
-        function closeAuthModal() {
-            document.getElementById('authModal').style.display = 'none';
         }
+    };
 
-        function switchAuthTab(tab) {
+    function closeAuthModal() {
+        const modal = document.getElementById('authModal');
+        if (modal) {
+            modal.style.display = 'none';
+            clearAuthMessages();
+        }
+    }
+
+    function switchAuthTab(tab) {
+        try {
             const loginForm = document.getElementById('loginForm');
             const signupForm = document.getElementById('signupForm');
             const tabs = document.querySelectorAll('.auth-tab');
 
             tabs.forEach(t => t.classList.remove('active'));
-            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            const activeTab = document.querySelector(`[data-tab="${tab}"]`);
+            if (activeTab) activeTab.classList.add('active');
 
             if (tab === 'login') {
-                loginForm.style.display = 'block';
-                signupForm.style.display = 'none';
+                if (loginForm) loginForm.style.display = 'block';
+                if (signupForm) signupForm.style.display = 'none';
             } else {
-                loginForm.style.display = 'none';
-                signupForm.style.display = 'block';
+                if (loginForm) loginForm.style.display = 'none';
+                if (signupForm) signupForm.style.display = 'block';
             }
+        } catch (error) {
+            console.error('Error switching auth tab:', error);
         }
+    }
 
-        // Event listeners
-        document.getElementById('loginBtn').addEventListener('click', () => openAuthModal('login'));
-        document.getElementById('signupBtn').addEventListener('click', () => openAuthModal('signup'));
-        document.querySelector('.close').addEventListener('click', closeAuthModal);
+    function clearAuthMessages() {
+        const successMsg = document.getElementById('authSuccessMessage');
+        const errorMsg = document.getElementById('authErrorMessage');
+        if (successMsg) successMsg.style.display = 'none';
+        if (errorMsg) errorMsg.style.display = 'none';
+    }
+
+    // EVENT LISTENERS
+    try {
+        document.getElementById('loginBtn')?.addEventListener('click', () => openAuthModal('login'));
+        document.getElementById('signupBtn')?.addEventListener('click', () => openAuthModal('signup'));
+        document.querySelector('.close')?.addEventListener('click', closeAuthModal);
 
         document.querySelectorAll('.auth-tab').forEach(tab => {
             tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab));
         });
 
-        // Close modal when clicking outside
         window.addEventListener('click', (event) => {
             const modal = document.getElementById('authModal');
             if (event.target === modal) {
                 closeAuthModal();
             }
         });
+    } catch (error) {
+        console.error('Error setting up event listeners:', error);
+    }
 
-        // Login form
-        document.querySelector('#loginForm form').addEventListener('submit', async (e) => {
+    // LOGIN FORM
+    const loginForm = document.querySelector('#loginForm form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
+            const email = document.getElementById('loginEmail')?.value.trim();
+            const password = document.getElementById('loginPassword')?.value;
+
+            if (!email || !password) {
+                showAuthMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.innerHTML = '<span class="loading"></span> Logging in...';
+            submitBtn.disabled = true;
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
                 showAuthMessage('Login successful!', 'success');
-                setTimeout(closeAuthModal, 1500);
+                setTimeout(() => {
+                    closeAuthModal();
+                    document.getElementById('loginEmail').value = '';
+                    document.getElementById('loginPassword').value = '';
+                }, 1000);
             } catch (error) {
-                showAuthMessage(error.message, 'error');
+                console.error('Login error:', error);
+                showAuthMessage(getFirebaseErrorMessage(error), 'error');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
             }
         });
+    }
 
-        // Signup form
-        document.querySelector('#signupForm form').addEventListener('submit', async (e) => {
+    // SIGNUP FORM
+    const signupForm = document.querySelector('#signupForm form');
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = document.getElementById('signupName').value;
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+            const name = document.getElementById('signupName')?.value.trim();
+            const email = document.getElementById('signupEmail')?.value.trim();
+            const password = document.getElementById('signupPassword')?.value;
+            const confirmPassword = document.getElementById('signupConfirmPassword')?.value;
+
+            if (!name || !email || !password || !confirmPassword) {
+                showAuthMessage('Please fill in all fields', 'error');
+                return;
+            }
 
             if (password !== confirmPassword) {
                 showAuthMessage('Passwords do not match!', 'error');
                 return;
             }
 
+            if (password.length < 6) {
+                showAuthMessage('Password must be at least 6 characters long', 'error');
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.innerHTML = '<span class="loading"></span> Creating account...';
+            submitBtn.disabled = true;
+
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await updateProfile(userCredential.user, { displayName: name });
                 showAuthMessage('Account created successfully!', 'success');
-                setTimeout(closeAuthModal, 1500);
+                setTimeout(() => {
+                    closeAuthModal();
+                    document.getElementById('signupName').value = '';
+                    document.getElementById('signupEmail').value = '';
+                    document.getElementById('signupPassword').value = '';
+                    document.getElementById('signupConfirmPassword').value = '';
+                }, 1000);
             } catch (error) {
-                showAuthMessage(error.message, 'error');
+                console.error('Signup error:', error);
+                showAuthMessage(getFirebaseErrorMessage(error), 'error');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
             }
         });
+    }
 
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                showMessage('Logged out successfully!', 'success', 'successMessage');
-            } catch (error) {
-                showMessage('Error logging out: ' + error.message, 'error', 'errorMessage');
-            }
-        });
-
-        function showAuthMessage(message, type) {
-            const successMsg = document.getElementById('authSuccessMessage');
-            const errorMsg = document.getElementById('authErrorMessage');
-
-            if (type === 'success') {
-                successMsg.textContent = message;
-                successMsg.style.display = 'block';
-                errorMsg.style.display = 'none';
-            } else {
-                errorMsg.textContent = message;
-                errorMsg.style.display = 'block';
-                successMsg.style.display = 'none';
-            }
-
-            setTimeout(() => {
-                successMsg.style.display = 'none';
-                errorMsg.style.display = 'none';
-            }, 5000);
+    // LOGOUT
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        try {
+            await signOut(auth);
+            visibleQuestions = 4;
+            showMessage('Logged out successfully!', 'success', 'successMessage');
+        } catch (error) {
+            console.error('Logout error:', error);
+            showMessage('Error logging out: ' + error.message, 'error', 'errorMessage');
         }
+    });
 
-        // Question form
-        document.getElementById('questionForm').addEventListener('submit', async (e) => {
+    // QUESTION FORM
+    const questionForm = document.getElementById('questionForm');
+    if (questionForm) {
+        questionForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             if (!currentUser) {
                 showMessage('Please login to ask questions', 'error', 'errorMessage');
+                return;
+            }
+
+            const questionText = document.getElementById('question')?.value.trim();
+            if (!questionText) {
+                showMessage('Please enter a question', 'error', 'errorMessage');
                 return;
             }
 
@@ -1486,9 +1564,8 @@
             submitButton.innerHTML = '<span class="loading"></span> Submitting...';
             submitButton.disabled = true;
 
-            const questionText = document.getElementById('question').value.trim();
-
             try {
+                console.log('Submitting question:', questionText);
                 await addDoc(collection(db, 'questions'), {
                     question: questionText,
                     author: {
@@ -1506,353 +1583,641 @@
                 });
 
                 showMessage('Question submitted successfully!', 'success', 'successMessage');
-                document.getElementById('questionForm').reset();
-                await loadQuestions();
+                questionForm.reset();
+                visibleQuestions = 4;
+                setTimeout(loadQuestions, 500);
 
             } catch (error) {
+                console.error('Error submitting question:', error);
                 showMessage('Error submitting question: ' + error.message, 'error', 'errorMessage');
             } finally {
                 submitButton.textContent = originalText;
                 submitButton.disabled = false;
             }
         });
+    }
 
-        // Load questions
-        async function loadQuestions() {
-            try {
-                const q = query(collection(db, 'questions'), orderBy('timestamp', 'desc'), limit(20));
-                const querySnapshot = await getDocs(q);
+    // LOAD QUESTIONS - COMPLETELY FIXED
+    async function loadQuestions() {
+        if (isLoadingQuestions) return;
+        isLoadingQuestions = true;
 
-                const questionsContainer = document.getElementById('questionsContainer');
-
-                if (querySnapshot.empty) {
-                    questionsContainer.innerHTML = '<p style="text-align: center; opacity: 0.8;">No questions yet. Be the first to ask!</p>';
-                    return;
-                }
-
-                let questionsHTML = '';
-                querySnapshot.forEach((docSnapshot) => {
-                    const data = docSnapshot.data();
-                    const date = data.timestamp?.toDate?.() || new Date();
-                    const isOwner = currentUser && currentUser.uid === data.author.uid;
-
-                    questionsHTML += createQuestionHTML(docSnapshot.id, data, date, isOwner);
-                });
-
-                questionsContainer.innerHTML = questionsHTML;
-
-            } catch (error) {
-                console.error('Error loading questions: ', error);
-                document.getElementById('questionsContainer').innerHTML =
-                    '<p style="text-align: center; opacity: 0.8; color: #ff6b6b;">Error loading questions. Please refresh the page.</p>';
-            }
+        const questionsContainer = document.getElementById('questionsContainer');
+        
+        if (!questionsContainer) {
+            console.error('Questions container not found');
+            isLoadingQuestions = false;
+            return;
         }
 
-        function createQuestionHTML(questionId, data, date, isOwner) {
-            const userVote = currentUser ? data.votedBy?.find(v => v.uid === currentUser.uid) : null;
+        console.log('Loading questions...');
+        
+        // Show loading message
+        questionsContainer.innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <div class="loading"></div>
+                <p style="margin-top: 1rem; color: white;">Loading questions...</p>
+            </div>
+        `;
+
+        try {
+            console.log('Fetching from Firestore...');
+            const q = query(collection(db, 'questions'), orderBy('timestamp', 'desc'));
+            const querySnapshot = await getDocs(q);
+            
+            console.log('Query snapshot size:', querySnapshot.size);
+
+            if (querySnapshot.empty) {
+                questionsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: white;">
+                        <p style="opacity: 0.8;">No questions yet. Be the first to ask!</p>
+                    </div>
+                `;
+                isLoadingQuestions = false;
+                return;
+            }
+
+            // Process questions with better error handling
+            allQuestions = [];
+            querySnapshot.forEach((docSnapshot) => {
+                try {
+                    const data = docSnapshot.data();
+                    console.log('Processing question:', docSnapshot.id, data);
+                    
+                    // Handle timestamp safely
+                    let date;
+                    if (data.timestamp) {
+                        if (data.timestamp.toDate) {
+                            date = data.timestamp.toDate();
+                        } else if (data.timestamp instanceof Date) {
+                            date = data.timestamp;
+                        } else {
+                            date = new Date(data.timestamp);
+                        }
+                    } else {
+                        date = new Date();
+                    }
+                    
+                    // Handle author data safely
+                    const author = data.author || { name: 'Anonymous', uid: '', email: '' };
+                    const isOwner = currentUser && currentUser.uid && author.uid && currentUser.uid === author.uid;
+                    
+                    allQuestions.push({
+                        id: docSnapshot.id,
+                        data: {
+                            ...data,
+                            author: author,
+                            upvotes: data.upvotes || 0,
+                            downvotes: data.downvotes || 0,
+                            votedBy: data.votedBy || [],
+                            answers: data.answers || [],
+                            comments: data.comments || []
+                        },
+                        date: date,
+                        isOwner: isOwner
+                    });
+                } catch (err) {
+                    console.error('Error processing question:', docSnapshot.id, err);
+                }
+            });
+
+            console.log('Processed questions:', allQuestions.length);
+            displayQuestions();
+
+        } catch (error) {
+            console.error('Error loading questions:', error);
+            questionsContainer.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="background: rgba(255,107,107,0.2); backdrop-filter: blur(10px); padding: 2rem; border-radius: 15px; border: 1px solid rgba(255,107,107,0.3);">
+                        <p style="color: #ff6b6b; margin-bottom: 1rem; font-weight: 600;">⚠️ Error Loading Questions</p>
+                        <p style="color: white; opacity: 0.9; margin-bottom: 1rem;">${error.message}</p>
+                        <button class="btn btn-primary" onclick="window.location.reload()">Refresh Page</button>
+                    </div>
+                </div>
+            `;
+        } finally {
+            isLoadingQuestions = false;
+        }
+    }
+
+    // DISPLAY QUESTIONS - FIXED
+    function displayQuestions() {
+        try {
+            const questionsContainer = document.getElementById('questionsContainer');
+            
+            if (allQuestions.length === 0) {
+                questionsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: white;">
+                        <p style="opacity: 0.8;">No questions yet. Be the first to ask!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            console.log('Displaying questions. Total:', allQuestions.length, 'Visible:', visibleQuestions);
+
+            let questionsHTML = '';
+            const questionsToShow = Math.min(visibleQuestions, allQuestions.length);
+            
+            for (let i = 0; i < questionsToShow; i++) {
+                const question = allQuestions[i];
+                // Update ownership for current user
+                question.isOwner = currentUser && currentUser.uid && question.data.author?.uid && 
+                                  currentUser.uid === question.data.author.uid;
+                
+                questionsHTML += createQuestionHTML(question.id, question.data, question.date, question.isOwner);
+            }
+
+            questionsContainer.innerHTML = questionsHTML;
+
+            // Add "See More" button if needed
+            if (visibleQuestions < allQuestions.length) {
+                const remaining = allQuestions.length - visibleQuestions;
+                questionsContainer.innerHTML += `
+                    <div style="text-align: center; margin: 2rem 0; padding: 2rem;">
+                        <button class="btn btn-primary" onclick="window.loadMoreQuestions()" id="seeMoreBtn">
+                            See More Questions (${remaining} remaining)
+                        </button>
+                    </div>
+                `;
+            }
+
+            console.log('Questions displayed successfully');
+        } catch (error) {
+            console.error('Error displaying questions:', error);
+        }
+    }
+
+    // LOAD MORE QUESTIONS
+    window.loadMoreQuestions = function() {
+        const btn = document.getElementById('seeMoreBtn');
+        if (btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loading"></span> Loading...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                visibleQuestions += QUESTIONS_PER_LOAD;
+                displayQuestions();
+            }, 300);
+        }
+    };
+
+    // CREATE QUESTION HTML - FIXED
+    function createQuestionHTML(questionId, data, date, isOwner) {
+        try {
+            const authorName = escapeHtml(data.author?.name || 'Anonymous');
+            const questionText = escapeHtml(data.question || '');
+            const userVote = currentUser && data.votedBy ? 
+                            data.votedBy.find(v => v.uid === currentUser.uid) : null;
             const voteScore = (data.upvotes || 0) - (data.downvotes || 0);
 
             return `
-                <div class="question-item">
+                <div class="question-item" style="position: relative;">
                     <div class="question-header">
                         <div>
-                            <h4 style="margin-bottom: 0.5rem;">${escapeHtml(data.question)}</h4>
+                            <h4 style="margin-bottom: 0.5rem; color: white; word-break: break-word;">${questionText}</h4>
                             <div class="question-meta">
-                                <span>Asked by: ${escapeHtml(data.author.name)}</span>
+                                <span>Asked by: ${authorName}</span>
                                 <span>•</span>
                                 <span>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</span>
                                 ${data.answers?.length ? `<span>• ${data.answers.length} answers</span>` : ''}
                                 ${data.comments?.length ? `<span>• ${data.comments.length} comments</span>` : ''}
                             </div>
                         </div>
-                        ${isOwner ? `<button class="delete-btn" onclick="deleteQuestion('${questionId}')">×</button>` : ''}
+                        ${isOwner ? `<button class="delete-btn" onclick="window.deleteQuestion('${questionId}')">×</button>` : ''}
                     </div>
                     
                     <div class="question-actions">
                         <div class="vote-buttons">
                             <button class="vote-btn ${userVote?.type === 'upvote' ? 'upvoted' : ''}" 
-                                    onclick="voteQuestion('${questionId}', 'upvote')"
-                                    ${!currentUser ? 'disabled' : ''}>
+                                    onclick="window.voteQuestion('${questionId}', 'upvote')"
+                                    ${!currentUser ? 'disabled title="Login to vote"' : ''}>
                                 ↑ ${data.upvotes || 0}
                             </button>
-                            <span style="margin: 0 0.5rem;">Score: ${voteScore}</span>
+                            <span style="margin: 0 0.5rem; color: white;">Score: ${voteScore}</span>
                             <button class="vote-btn ${userVote?.type === 'downvote' ? 'downvoted' : ''}" 
-                                    onclick="voteQuestion('${questionId}', 'downvote')"
-                                    ${!currentUser ? 'disabled' : ''}>
+                                    onclick="window.voteQuestion('${questionId}', 'downvote')"
+                                    ${!currentUser ? 'disabled title="Login to vote"' : ''}>
                                 ↓ ${data.downvotes || 0}
                             </button>
                         </div>
-                        <button class="action-btn" onclick="toggleCommentForm('${questionId}')" ${!currentUser ? 'disabled' : ''}>
+                        <button class="action-btn" onclick="window.toggleCommentForm('${questionId}')" 
+                                ${!currentUser ? 'disabled title="Login to comment"' : ''}>
                             💬 Comment
                         </button>
-                        <button class="action-btn" onclick="toggleAnswerForm('${questionId}')" ${!currentUser ? 'disabled' : ''}>
+                        <button class="action-btn" onclick="window.toggleAnswerForm('${questionId}')" 
+                                ${!currentUser ? 'disabled title="Login to answer"' : ''}>
                             💡 Answer
                         </button>
-                        <button class="action-btn" onclick="flagQuestion('${questionId}')" ${!currentUser ? 'disabled' : ''}>
+                        <button class="action-btn" onclick="window.flagQuestion('${questionId}')" 
+                                ${!currentUser ? 'disabled title="Login to flag"' : ''}>
                             🚩 Flag
                         </button>
                     </div>
 
-                    <div id="commentForm-${questionId}" class="comment-form">
-                        <textarea placeholder="Add a comment..." id="commentText-${questionId}"></textarea>
-                        <div style="margin-top: 0.5rem;">
-                            <button class="btn btn-primary btn-small" onclick="submitComment('${questionId}')">Post Comment</button>
-                            <button class="btn btn-secondary btn-small" onclick="toggleCommentForm('${questionId}')">Cancel</button>
+                    ${currentUser ? `
+                        <div id="commentForm-${questionId}" class="comment-form">
+                            <textarea placeholder="Add a comment..." id="commentText-${questionId}"></textarea>
+                            <div style="margin-top: 0.5rem;">
+                                <button class="btn btn-primary btn-small" onclick="window.submitComment('${questionId}')">Post Comment</button>
+                                <button class="btn btn-secondary btn-small" onclick="window.toggleCommentForm('${questionId}')">Cancel</button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div id="answerForm-${questionId}" class="answer-form">
-                        <textarea placeholder="Write your answer..." id="answerText-${questionId}"></textarea>
-                        <div style="margin-top: 0.5rem;">
-                            <button class="btn btn-primary btn-small" onclick="submitAnswer('${questionId}')">Post Answer</button>
-                            <button class="btn btn-secondary btn-small" onclick="toggleAnswerForm('${questionId}')">Cancel</button>
+                        <div id="answerForm-${questionId}" class="answer-form">
+                            <textarea placeholder="Write your answer..." id="answerText-${questionId}"></textarea>
+                            <div style="margin-top: 0.5rem;">
+                                <button class="btn btn-primary btn-small" onclick="window.submitAnswer('${questionId}')">Post Answer</button>
+                                <button class="btn btn-secondary btn-small" onclick="window.toggleAnswerForm('${questionId}')">Cancel</button>
+                            </div>
                         </div>
-                    </div>
+                    ` : ''}
 
                     ${data.comments?.length ? createCommentsHTML(data.comments) : ''}
                     ${data.answers?.length ? createAnswersHTML(data.answers) : ''}
                 </div>
             `;
+        } catch (error) {
+            console.error('Error creating question HTML:', error);
+            return `<div class="question-item"><p style="color: white;">Error displaying question</p></div>`;
         }
+    }
 
-        function createCommentsHTML(comments) {
-            let html = '<div class="comments-section"><h5 style="margin-bottom: 1rem;">Comments:</h5>';
-            comments.forEach((comment, index) => {
+    function createCommentsHTML(comments) {
+        try {
+            let html = '<div class="comments-section"><h5 style="margin-bottom: 1rem; color: white;">Comments:</h5>';
+            comments.forEach((comment) => {
                 const date = comment.timestamp?.toDate?.() || new Date();
+                const authorName = escapeHtml(comment.author?.name || 'Anonymous');
+                const commentText = escapeHtml(comment.text || '');
+                
                 html += `
                     <div class="comment-item">
-                        <p style="margin-bottom: 0.5rem;">${escapeHtml(comment.text)}</p>
-                        <small style="opacity: 0.8;">By ${escapeHtml(comment.author.name)} on ${date.toLocaleDateString()}</small>
+                        <p style="margin-bottom: 0.5rem; color: white; word-break: break-word;">${commentText}</p>
+                        <small style="opacity: 0.8; color: rgba(255,255,255,0.7);">
+                            By ${authorName} on ${date.toLocaleDateString()}
+                        </small>
                     </div>
                 `;
             });
             html += '</div>';
             return html;
+        } catch (error) {
+            console.error('Error creating comments HTML:', error);
+            return '';
         }
+    }
 
-        function createAnswersHTML(answers) {
-            let html = '<div class="answers-section"><h5 style="margin-bottom: 1rem;">Answers:</h5>';
-            answers.forEach((answer, index) => {
+    function createAnswersHTML(answers) {
+        try {
+            let html = '<div class="answers-section"><h5 style="margin-bottom: 1rem; color: white;">Answers:</h5>';
+            answers.forEach((answer) => {
                 const date = answer.timestamp?.toDate?.() || new Date();
+                const authorName = escapeHtml(answer.author?.name || 'Anonymous');
+                const answerText = escapeHtml(answer.text || '');
                 const userVote = currentUser ? answer.votedBy?.find(v => v.uid === currentUser.uid) : null;
                 const voteScore = (answer.upvotes || 0) - (answer.downvotes || 0);
 
                 html += `
                     <div class="answer-item">
-                        <p style="margin-bottom: 1rem;">${escapeHtml(answer.text)}</p>
+                        <p style="margin-bottom: 1rem; color: white; word-break: break-word;">${answerText}</p>
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                            <small style="opacity: 0.8;">By ${escapeHtml(answer.author.name)} on ${date.toLocaleDateString()}</small>
+                            <small style="opacity: 0.8; color: rgba(255,255,255,0.7);">
+                                By ${authorName} on ${date.toLocaleDateString()}
+                            </small>
                             <div class="vote-buttons">
                                 <button class="vote-btn ${userVote?.type === 'upvote' ? 'upvoted' : ''}" 
                                         ${!currentUser ? 'disabled' : ''}>
                                     ↑ ${answer.upvotes || 0}
                                 </button>
-                                <span style="margin: 0 0.5rem;">Score: ${voteScore}</span>
+                                <span style="margin: 0 0.5rem; color: white;">Score: ${voteScore}</span>
                                 <button class="vote-btn ${userVote?.type === 'downvote' ? 'downvoted' : ''}" 
                                         ${!currentUser ? 'disabled' : ''}>
                                     ↓ ${answer.downvotes || 0}
                                 </button>
                             </div>
                         </div>
-                        ${answer.comments?.length ? createCommentsHTML(answer.comments) : ''}
                     </div>
                 `;
             });
             html += '</div>';
             return html;
+        } catch (error) {
+            console.error('Error creating answers HTML:', error);
+            return '';
+        }
+    }
+
+    // INTERACTIVE FUNCTIONS - ALL FIXED
+    window.voteQuestion = async function (questionId, voteType) {
+        if (!currentUser) {
+            showMessage('Please login to vote', 'error', 'errorMessage');
+            return;
         }
 
-        // Vote on question
-        window.voteQuestion = async function (questionId, voteType) {
-            if (!currentUser) {
-                showMessage('Please login to vote', 'error', 'errorMessage');
+        try {
+            const questionRef = doc(db, 'questions', questionId);
+            const questionSnap = await getDoc(questionRef);
+
+            if (questionSnap.exists()) {
+                const data = questionSnap.data();
+                const votedBy = data.votedBy || [];
+                const existingVote = votedBy.find(v => v.uid === currentUser.uid);
+
+                let newVotedBy = [...votedBy];
+                let upvotes = data.upvotes || 0;
+                let downvotes = data.downvotes || 0;
+
+                if (existingVote) {
+                    newVotedBy = newVotedBy.filter(v => v.uid !== currentUser.uid);
+                    if (existingVote.type === 'upvote') upvotes--;
+                    else downvotes--;
+                }
+
+                if (!existingVote || existingVote.type !== voteType) {
+                    newVotedBy.push({ uid: currentUser.uid, type: voteType });
+                    if (voteType === 'upvote') upvotes++;
+                    else downvotes++;
+                }
+
+                await updateDoc(questionRef, {
+                    votedBy: newVotedBy,
+                    upvotes: upvotes,
+                    downvotes: downvotes
+                });
+
+                // Update local data
+                const questionIndex = allQuestions.findIndex(q => q.id === questionId);
+                if (questionIndex !== -1) {
+                    allQuestions[questionIndex].data.votedBy = newVotedBy;
+                    allQuestions[questionIndex].data.upvotes = upvotes;
+                    allQuestions[questionIndex].data.downvotes = downvotes;
+                    displayQuestions();
+                }
+            }
+        } catch (error) {
+            console.error('Error voting:', error);
+            showMessage('Error voting. Please try again.', 'error', 'errorMessage');
+        }
+    };
+
+    window.toggleCommentForm = function (questionId) {
+        try {
+            const form = document.getElementById(`commentForm-${questionId}`);
+            if (form) {
+                const isVisible = form.style.display === 'block';
+                form.style.display = isVisible ? 'none' : 'block';
+                if (!isVisible) {
+                    const textarea = form.querySelector('textarea');
+                    if (textarea) textarea.focus();
+                }
+            }
+        } catch (error) {
+            console.error('Error toggling comment form:', error);
+        }
+    };
+
+    window.toggleAnswerForm = function (questionId) {
+        try {
+            const form = document.getElementById(`answerForm-${questionId}`);
+            if (form) {
+                const isVisible = form.style.display === 'block';
+                form.style.display = isVisible ? 'none' : 'block';
+                if (!isVisible) {
+                    const textarea = form.querySelector('textarea');
+                    if (textarea) textarea.focus();
+                }
+            }
+        } catch (error) {
+            console.error('Error toggling answer form:', error);
+        }
+    };
+
+    window.submitComment = async function (questionId) {
+        if (!currentUser) return;
+
+        try {
+            const textarea = document.getElementById(`commentText-${questionId}`);
+            if (!textarea) return;
+            
+            const commentText = textarea.value.trim();
+            
+            if (!commentText) {
+                showMessage('Please enter a comment', 'error', 'errorMessage');
                 return;
             }
 
-            try {
-                const questionRef = doc(db, 'questions', questionId);
-                const questionSnap = await getDoc(questionRef);
+            const questionRef = doc(db, 'questions', questionId);
+            await updateDoc(questionRef, {
+                comments: arrayUnion({
+                    text: commentText,
+                    author: {
+                        uid: currentUser.uid,
+                        name: currentUser.displayName || currentUser.email.split('@')[0],
+                        email: currentUser.email
+                    },
+                    timestamp: serverTimestamp()
+                })
+            });
 
-                if (questionSnap.exists()) {
-                    const data = questionSnap.data();
-                    const votedBy = data.votedBy || [];
-                    const existingVote = votedBy.find(v => v.uid === currentUser.uid);
-
-                    let newVotedBy = [...votedBy];
-                    let upvotes = data.upvotes || 0;
-                    let downvotes = data.downvotes || 0;
-
-                    if (existingVote) {
-                        // Remove existing vote
-                        newVotedBy = newVotedBy.filter(v => v.uid !== currentUser.uid);
-                        if (existingVote.type === 'upvote') upvotes--;
-                        else downvotes--;
-                    }
-
-                    // Add new vote if different from existing
-                    if (!existingVote || existingVote.type !== voteType) {
-                        newVotedBy.push({ uid: currentUser.uid, type: voteType });
-                        if (voteType === 'upvote') upvotes++;
-                        else downvotes++;
-                    }
-
-                    await updateDoc(questionRef, {
-                        votedBy: newVotedBy,
-                        upvotes: upvotes,
-                        downvotes: downvotes
-                    });
-
-                    await loadQuestions();
-                }
-            } catch (error) {
-                console.error('Error voting: ', error);
-                showMessage('Error voting. Please try again.', 'error', 'errorMessage');
-            }
-        };
-
-        // Toggle comment form
-        window.toggleCommentForm = function (questionId) {
-            const form = document.getElementById(`commentForm-${questionId}`);
-            form.style.display = form.style.display === 'block' ? 'none' : 'block';
-        };
-
-        // Toggle answer form
-        window.toggleAnswerForm = function (questionId) {
-            const form = document.getElementById(`answerForm-${questionId}`);
-            form.style.display = form.style.display === 'block' ? 'none' : 'block';
-        };
-
-        // Submit comment
-        window.submitComment = async function (questionId) {
-            if (!currentUser) return;
-
-            const commentText = document.getElementById(`commentText-${questionId}`).value.trim();
-            if (!commentText) return;
-
-            try {
-                const questionRef = doc(db, 'questions', questionId);
-                await updateDoc(questionRef, {
-                    comments: arrayUnion({
-                        text: commentText,
-                        author: {
-                            uid: currentUser.uid,
-                            name: currentUser.displayName || currentUser.email.split('@')[0],
-                            email: currentUser.email
-                        },
-                        timestamp: serverTimestamp()
-                    })
-                });
-
-                document.getElementById(`commentText-${questionId}`).value = '';
-                toggleCommentForm(questionId);
-                await loadQuestions();
-            } catch (error) {
-                console.error('Error adding comment: ', error);
-                showMessage('Error adding comment. Please try again.', 'error', 'errorMessage');
-            }
-        };
-
-        // Submit answer
-        window.submitAnswer = async function (questionId) {
-            if (!currentUser) return;
-
-            const answerText = document.getElementById(`answerText-${questionId}`).value.trim();
-            if (!answerText) return;
-
-            try {
-                const questionRef = doc(db, 'questions', questionId);
-                await updateDoc(questionRef, {
-                    answers: arrayUnion({
-                        text: answerText,
-                        author: {
-                            uid: currentUser.uid,
-                            name: currentUser.displayName || currentUser.email.split('@')[0],
-                            email: currentUser.email
-                        },
-                        timestamp: serverTimestamp(),
-                        upvotes: 0,
-                        downvotes: 0,
-                        votedBy: [],
-                        comments: []
-                    })
-                });
-
-                document.getElementById(`answerText-${questionId}`).value = '';
-                toggleAnswerForm(questionId);
-                await loadQuestions();
-                showMessage('Answer posted successfully!', 'success', 'successMessage');
-            } catch (error) {
-                console.error('Error adding answer: ', error);
-                showMessage('Error adding answer. Please try again.', 'error', 'errorMessage');
-            }
-        };
-
-        // Flag question
-        window.flagQuestion = async function (questionId) {
-            if (!currentUser) return;
-
-            if (confirm('Are you sure you want to flag this question as inappropriate?')) {
-                try {
-                    const questionRef = doc(db, 'questions', questionId);
-                    await updateDoc(questionRef, {
-                        flagged: true,
-                        flaggedBy: currentUser.uid,
-                        flaggedAt: serverTimestamp()
-                    });
-
-                    showMessage('Question flagged successfully.', 'success', 'successMessage');
-                } catch (error) {
-                    console.error('Error flagging question: ', error);
-                    showMessage('Error flagging question. Please try again.', 'error', 'errorMessage');
-                }
-            }
-        };
-
-        // Delete question
-        window.deleteQuestion = async function (questionId) {
-            if (!currentUser) return;
-
-            if (confirm('Are you sure you want to delete this question? This action cannot be undone.')) {
-                try {
-                    await deleteDoc(doc(db, 'questions', questionId));
-                    await loadQuestions();
-                    showMessage('Question deleted successfully.', 'success', 'successMessage');
-                } catch (error) {
-                    console.error('Error deleting question: ', error);
-                    showMessage('Error deleting question. Please try again.', 'error', 'errorMessage');
-                }
-            }
-        };
-
-        // Utility functions
-        function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.replace(/[&<>"']/g, function (m) { return map[m]; });
+            textarea.value = '';
+            toggleCommentForm(questionId);
+            showMessage('Comment added successfully!', 'success', 'successMessage');
+            setTimeout(loadQuestions, 1000);
+        } catch (error) {
+            console.error('Error adding comment:', error);
+            showMessage('Error adding comment. Please try again.', 'error', 'errorMessage');
         }
+    };
 
-        function showMessage(message, type, elementId) {
+    window.submitAnswer = async function (questionId) {
+        if (!currentUser) return;
+
+        try {
+            const textarea = document.getElementById(`answerText-${questionId}`);
+            if (!textarea) return;
+            
+            const answerText = textarea.value.trim();
+            
+            if (!answerText) {
+                showMessage('Please enter an answer', 'error', 'errorMessage');
+                return;
+            }
+
+            const questionRef = doc(db, 'questions', questionId);
+            await updateDoc(questionRef, {
+                answers: arrayUnion({
+                    text: answerText,
+                    author: {
+                        uid: currentUser.uid,
+                        name: currentUser.displayName || currentUser.email.split('@')[0],
+                        email: currentUser.email
+                    },
+                    timestamp: serverTimestamp(),
+                    upvotes: 0,
+                    downvotes: 0,
+                    votedBy: [],
+                    comments: []
+                })
+            });
+
+            textarea.value = '';
+            toggleAnswerForm(questionId);
+            showMessage('Answer posted successfully!', 'success', 'successMessage');
+            setTimeout(loadQuestions, 1000);
+        } catch (error) {
+            console.error('Error adding answer:', error);
+            showMessage('Error adding answer. Please try again.', 'error', 'errorMessage');
+        }
+    };
+
+    window.flagQuestion = async function (questionId) {
+        if (!currentUser) return;
+
+        if (confirm('Are you sure you want to flag this question as inappropriate?')) {
+            try {
+                const questionRef = doc(db, 'questions', questionId);
+                await updateDoc(questionRef, {
+                    flagged: true,
+                    flaggedBy: currentUser.uid,
+                    flaggedAt: serverTimestamp()
+                });
+
+                showMessage('Question flagged successfully.', 'success', 'successMessage');
+            } catch (error) {
+                console.error('Error flagging question:', error);
+                showMessage('Error flagging question. Please try again.', 'error', 'errorMessage');
+            }
+        }
+    };
+
+    window.deleteQuestion = async function (questionId) {
+        if (!currentUser) return;
+
+        if (confirm('Are you sure you want to delete this question? This action cannot be undone.')) {
+            try {
+                await deleteDoc(doc(db, 'questions', questionId));
+                allQuestions = allQuestions.filter(q => q.id !== questionId);
+                displayQuestions();
+                showMessage('Question deleted successfully.', 'success', 'successMessage');
+            } catch (error) {
+                console.error('Error deleting question:', error);
+                showMessage('Error deleting question. Please try again.', 'error', 'errorMessage');
+            }
+        }
+    };
+
+    // UTILITY FUNCTIONS
+    function escapeHtml(text) {
+        if (!text) return '';
+        try {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        } catch (error) {
+            return String(text).replace(/[&<>"']/g, function (s) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[s];
+            });
+        }
+    }
+
+    function showMessage(message, type, elementId) {
+        try {
             const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.style.display = 'block';
+            if (element) {
+                element.textContent = message;
+                element.style.display = 'block';
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 5000);
+            }
+        } catch (error) {
+            console.error('Error showing message:', error);
+        }
+    }
+
+    function showAuthMessage(message, type) {
+        try {
+            const successMsg = document.getElementById('authSuccessMessage');
+            const errorMsg = document.getElementById('authErrorMessage');
+
+            if (type === 'success') {
+                if (successMsg) {
+                    successMsg.textContent = message;
+                    successMsg.style.display = 'block';
+                }
+                if (errorMsg) errorMsg.style.display = 'none';
+            } else {
+                if (errorMsg) {
+                    errorMsg.textContent = message;
+                    errorMsg.style.display = 'block';
+                }
+                if (successMsg) successMsg.style.display = 'none';
+            }
 
             setTimeout(() => {
-                element.style.display = 'none';
+                if (successMsg) successMsg.style.display = 'none';
+                if (errorMsg) errorMsg.style.display = 'none';
             }, 5000);
+        } catch (error) {
+            console.error('Error showing auth message:', error);
         }
+    }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Page loaded, initializing Firebase...');
-            loadQuestions();
-        });
+    function getFirebaseErrorMessage(error) {
+        switch (error.code) {
+            case 'auth/user-not-found':
+                return 'No account found with this email address.';
+            case 'auth/wrong-password':
+                return 'Incorrect password. Please try again.';
+            case 'auth/email-already-in-use':
+                return 'An account with this email already exists.';
+            case 'auth/weak-password':
+                return 'Password should be at least 6 characters long.';
+            case 'auth/invalid-email':
+                return 'Please enter a valid email address.';
+            case 'auth/too-many-requests':
+                return 'Too many failed attempts. Please try again later.';
+            case 'auth/network-request-failed':
+                return 'Network error. Please check your connection.';
+            case 'auth/invalid-credential':
+                return 'Invalid email or password.';
+            default:
+                return error.message || 'An unexpected error occurred.';
+        }
+    }
 
-    </script>
+    // Initialize on page load - FIXED
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM loaded, Firebase initialized and ready!');
+        
+        // Initial load of questions after a short delay
+        setTimeout(() => {
+            if (!isLoadingQuestions) {
+                loadQuestions();
+            }
+        }, 1000);
+    });
+
+    // Also try to load questions when the window loads
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            if (!isLoadingQuestions && allQuestions.length === 0) {
+                loadQuestions();
+            }
+        }, 1500);
+    });
+
+    console.log('Firebase script loaded and initialized!');
+
+</script>
 
     <script>
         // Mobile menu toggle
