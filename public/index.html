@@ -1415,183 +1415,151 @@
         </div>
     </section>
 
-    <!-- Firebase Configuration -->
     <!-- Replace the entire Firebase script section with this -->
-    // FIXED FIREBASE SCRIPT - Replace the entire Firebase script section with this
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
-        import {
-            getFirestore,
-            collection,
-            addDoc,
-            getDocs,
-            query,
-            orderBy,
-            doc,
-            getDoc,
-            updateDoc,
-            deleteDoc,
-            arrayUnion,
-            serverTimestamp,
-            Timestamp
-        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-        import {
-            getAuth,
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword,
-            signOut,
-            onAuthStateChanged,
-            updateProfile
-        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAhw6BGox0iSJe24oqk4uzJKTWkfatVppw",
-            authDomain: "amoljadhav-iisc.firebaseapp.com",
-            projectId: "amoljadhav-iisc",
-            storageBucket: "amoljadhav-iisc.firebasestorage.app",
-            messagingSenderId: "862590830571",
-            appId: "1:862590830571:web:9ac4acc06d986fe318fbae",
-            measurementId: "G-GZC0JQEYTW"
-        };
+<script>
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyAhw6BGox0iSJe24oqk4uzJKTWkfatVppw",
+        authDomain: "amoljadhav-iisc.firebaseapp.com",
+        projectId: "amoljadhav-iisc",
+        storageBucket: "amoljadhav-iisc.firebasestorage.app",
+        messagingSenderId: "862590830571",
+        appId: "1:862590830571:web:9ac4acc06d986fe318fbae",
+        measurementId: "G-GZC0JQEYTW"
+    };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
 
-        // Global variables
-        let currentUser = null;
-        let allQuestions = [];
-        let visibleQuestions = 4;
-        const QUESTIONS_PER_LOAD = 4;
-        let isLoadingQuestions = false;
+    let currentUser = null;
+    let allQuestions = [];
+    let visibleQuestions = 4;
+    const QUESTIONS_PER_LOAD = 4;
+    let isLoadingQuestions = false;
 
-        // Auth state observer - FIXED
-        onAuthStateChanged(auth, (user) => {
-            console.log('Auth state changed:', user ? user.email : 'No user');
-            currentUser = user;
-            updateAuthUI(user);
+    // Auth state observer
+    auth.onAuthStateChanged((user) => {
+        console.log('Auth state changed:', user ? user.email : 'No user');
+        currentUser = user;
+        updateAuthUI(user);
+        
+        if (!isLoadingQuestions) {
+            setTimeout(() => {
+                loadQuestions();
+            }, 200);
+        }
+    });
 
-            // Load questions with a small delay to ensure UI updates are complete
-            if (!isLoadingQuestions) {
-                setTimeout(() => {
-                    loadQuestions();
-                }, 200);
+    function updateAuthUI(user) {
+        try {
+            const authBtn = document.getElementById('authBtn');
+            const userInfo = document.getElementById('userInfo');
+            const userName = document.getElementById('userName');
+            const studyMaterialsContent = document.getElementById('studyMaterialsContent');
+            const studyMaterialsAuth = document.getElementById('studyMaterialsAuth');
+            const qaAuthRequired = document.getElementById('qaAuthRequired');
+            const qaAuthenticated = document.getElementById('qaAuthenticated');
+
+            if (user) {
+                if (authBtn) authBtn.style.display = 'none';
+                if (userInfo) userInfo.style.display = 'flex';
+                if (userName) userName.textContent = `Welcome, ${user.displayName || user.email.split('@')[0]}!`;
+                if (studyMaterialsContent) studyMaterialsContent.style.display = 'none';
+                if (studyMaterialsAuth) studyMaterialsAuth.style.display = 'block';
+                if (qaAuthRequired) qaAuthRequired.style.display = 'none';
+                if (qaAuthenticated) qaAuthenticated.style.display = 'block';
+            } else {
+                if (authBtn) authBtn.style.display = 'block';
+                if (userInfo) userInfo.style.display = 'none';
+                if (studyMaterialsContent) studyMaterialsContent.style.display = 'block';
+                if (studyMaterialsAuth) studyMaterialsAuth.style.display = 'none';
+                if (qaAuthRequired) qaAuthRequired.style.display = 'block';
+                if (qaAuthenticated) qaAuthenticated.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error updating auth UI:', error);
+        }
+    }
+
+    window.openAuthModal = function(tab = 'login') {
+        const modal = document.getElementById('authModal');
+        if (modal) {
+            modal.style.display = 'block';
+            switchAuthTab(tab);
+        }
+    };
+
+    function closeAuthModal() {
+        const modal = document.getElementById('authModal');
+        if (modal) {
+            modal.style.display = 'none';
+            clearAuthMessages();
+        }
+    }
+
+    function switchAuthTab(tab) {
+        try {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const tabs = document.querySelectorAll('.auth-tab');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            const activeTab = document.querySelector(`[data-tab="${tab}"]`);
+            if (activeTab) activeTab.classList.add('active');
+
+            if (tab === 'login') {
+                if (loginForm) loginForm.style.display = 'block';
+                if (signupForm) signupForm.style.display = 'none';
+            } else {
+                if (loginForm) loginForm.style.display = 'none';
+                if (signupForm) signupForm.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Error switching auth tab:', error);
+        }
+    }
+
+    function clearAuthMessages() {
+        const successMsg = document.getElementById('authSuccessMessage');
+        const errorMsg = document.getElementById('authErrorMessage');
+        if (successMsg) successMsg.style.display = 'none';
+        if (errorMsg) errorMsg.style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const authBtn = document.getElementById('authBtn');
+        if (authBtn) {
+            authBtn.addEventListener('click', () => openAuthModal('login'));
+        }
+
+        const closeBtn = document.querySelector('.close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeAuthModal);
+        }
+
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab));
+        });
+
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('authModal');
+            if (event.target === modal) {
+                closeAuthModal();
             }
         });
 
-        // Update UI based on auth state
-        function updateAuthUI(user) {
-            try {
-                const authBtn = document.getElementById('authBtn');
-                const userInfo = document.getElementById('userInfo');
-                const userName = document.getElementById('userName');
-                const studyMaterialsContent = document.getElementById('studyMaterialsContent');
-                const studyMaterialsAuth = document.getElementById('studyMaterialsAuth');
-                const qaAuthRequired = document.getElementById('qaAuthRequired');
-                const qaAuthenticated = document.getElementById('qaAuthenticated');
-
-                if (user) {
-                    // User is logged in
-                    if (authBtn) authBtn.style.display = 'none';
-                    if (userInfo) userInfo.style.display = 'flex';
-                    if (userName) userName.textContent = `Welcome, ${user.displayName || user.email.split('@')[0]}!`;
-
-                    // Show authenticated content
-                    if (studyMaterialsContent) studyMaterialsContent.style.display = 'none';
-                    if (studyMaterialsAuth) studyMaterialsAuth.style.display = 'block';
-                    if (qaAuthRequired) qaAuthRequired.style.display = 'none';
-                    if (qaAuthenticated) qaAuthenticated.style.display = 'block';
-                } else {
-                    // User is not logged in
-                    if (authBtn) authBtn.style.display = 'block';
-                    if (userInfo) userInfo.style.display = 'none';
-
-                    // Show auth required content
-                    if (studyMaterialsContent) studyMaterialsContent.style.display = 'block';
-                    if (studyMaterialsAuth) studyMaterialsAuth.style.display = 'none';
-                    if (qaAuthRequired) qaAuthRequired.style.display = 'block';
-                    if (qaAuthenticated) qaAuthenticated.style.display = 'none';
-                }
-            } catch (error) {
-                console.error('Error updating auth UI:', error);
-            }
-        }
-
-        // MODAL FUNCTIONS
-        window.openAuthModal = function (tab = 'login') {
-            const modal = document.getElementById('authModal');
-            if (modal) {
-                modal.style.display = 'block';
-                switchAuthTab(tab);
-            }
-        };
-
-        function closeAuthModal() {
-            const modal = document.getElementById('authModal');
-            if (modal) {
-                modal.style.display = 'none';
-                clearAuthMessages();
-            }
-        }
-
-        function switchAuthTab(tab) {
-            try {
-                const loginForm = document.getElementById('loginForm');
-                const signupForm = document.getElementById('signupForm');
-                const tabs = document.querySelectorAll('.auth-tab');
-
-                tabs.forEach(t => t.classList.remove('active'));
-                const activeTab = document.querySelector(`[data-tab="${tab}"]`);
-                if (activeTab) activeTab.classList.add('active');
-
-                if (tab === 'login') {
-                    if (loginForm) loginForm.style.display = 'block';
-                    if (signupForm) signupForm.style.display = 'none';
-                } else {
-                    if (loginForm) loginForm.style.display = 'none';
-                    if (signupForm) signupForm.style.display = 'block';
-                }
-            } catch (error) {
-                console.error('Error switching auth tab:', error);
-            }
-        }
-
-        function clearAuthMessages() {
-            const successMsg = document.getElementById('authSuccessMessage');
-            const errorMsg = document.getElementById('authErrorMessage');
-            if (successMsg) successMsg.style.display = 'none';
-            if (errorMsg) errorMsg.style.display = 'none';
-        }
-
-        // EVENT LISTENERS
-        try {
-            document.getElementById('authBtn')?.addEventListener('click', () => openAuthModal('login'));
-            document.querySelector('.close')?.addEventListener('click', closeAuthModal);
-
-            document.querySelectorAll('.auth-tab').forEach(tab => {
-                tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab));
-            });
-
-            window.addEventListener('click', (event) => {
-                const modal = document.getElementById('authModal');
-                if (event.target === modal) {
-                    closeAuthModal();
-                }
-            });
-        } catch (error) {
-            console.error('Error setting up event listeners:', error);
-        }
-
-        // LOGIN FORM
+        // Login form
         const loginForm = document.querySelector('#loginForm form');
         if (loginForm) {
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const email = document.getElementById('loginEmail')?.value.trim();
-                const password = document.getElementById('loginPassword')?.value;
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value;
 
                 if (!email || !password) {
                     showAuthMessage('Please fill in all fields', 'error');
@@ -1604,7 +1572,7 @@
                 submitBtn.disabled = true;
 
                 try {
-                    await signInWithEmailAndPassword(auth, email, password);
+                    await auth.signInWithEmailAndPassword(email, password);
                     showAuthMessage('Login successful!', 'success');
                     setTimeout(() => {
                         closeAuthModal();
@@ -1621,15 +1589,15 @@
             });
         }
 
-        // SIGNUP FORM
+        // Signup form
         const signupForm = document.querySelector('#signupForm form');
         if (signupForm) {
             signupForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const name = document.getElementById('signupName')?.value.trim();
-                const email = document.getElementById('signupEmail')?.value.trim();
-                const password = document.getElementById('signupPassword')?.value;
-                const confirmPassword = document.getElementById('signupConfirmPassword')?.value;
+                const name = document.getElementById('signupName').value.trim();
+                const email = document.getElementById('signupEmail').value.trim();
+                const password = document.getElementById('signupPassword').value;
+                const confirmPassword = document.getElementById('signupConfirmPassword').value;
 
                 if (!name || !email || !password || !confirmPassword) {
                     showAuthMessage('Please fill in all fields', 'error');
@@ -1652,8 +1620,8 @@
                 submitBtn.disabled = true;
 
                 try {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    await updateProfile(userCredential.user, { displayName: name });
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    await userCredential.user.updateProfile({ displayName: name });
                     showAuthMessage('Account created successfully!', 'success');
                     setTimeout(() => {
                         closeAuthModal();
@@ -1672,19 +1640,22 @@
             });
         }
 
-        // LOGOUT
-        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                visibleQuestions = 4;
-                showMessage('Logged out successfully!', 'success', 'successMessage');
-            } catch (error) {
-                console.error('Logout error:', error);
-                showMessage('Error logging out: ' + error.message, 'error', 'errorMessage');
-            }
-        });
+        // Logout
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                try {
+                    await auth.signOut();
+                    visibleQuestions = 4;
+                    showMessage('Logged out successfully!', 'success', 'successMessage');
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    showMessage('Error logging out: ' + error.message, 'error', 'errorMessage');
+                }
+            });
+        }
 
-        // QUESTION FORM
+        // Question form
         const questionForm = document.getElementById('questionForm');
         if (questionForm) {
             questionForm.addEventListener('submit', async (e) => {
@@ -1695,7 +1666,7 @@
                     return;
                 }
 
-                const questionText = document.getElementById('question')?.value.trim();
+                const questionText = document.getElementById('question').value.trim();
                 if (!questionText) {
                     showMessage('Please enter a question', 'error', 'errorMessage');
                     return;
@@ -1707,15 +1678,14 @@
                 submitButton.disabled = true;
 
                 try {
-                    console.log('Submitting question:', questionText);
-                    await addDoc(collection(db, 'questions'), {
+                    await db.collection('questions').add({
                         question: questionText,
                         author: {
                             uid: currentUser.uid,
                             name: currentUser.displayName || currentUser.email.split('@')[0],
                             email: currentUser.email
                         },
-                        timestamp: serverTimestamp(),
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         upvotes: 0,
                         downvotes: 0,
                         votedBy: [],
@@ -1738,183 +1708,138 @@
                 }
             });
         }
+    });
 
-        // LOAD QUESTIONS - COMPLETELY FIXED
-        async function loadQuestions() {
-            if (isLoadingQuestions) return;
-            isLoadingQuestions = true;
+    // Load questions function
+    async function loadQuestions() {
+        if (isLoadingQuestions) return;
+        isLoadingQuestions = true;
 
-            const questionsContainer = document.getElementById('questionsContainer');
+        const questionsContainer = document.getElementById('questionsContainer');
+        if (!questionsContainer) {
+            isLoadingQuestions = false;
+            return;
+        }
 
-            if (!questionsContainer) {
-                console.error('Questions container not found');
-                isLoadingQuestions = false;
-                return;
-            }
-
-            console.log('Loading questions...');
-
-            // Show loading message
-            questionsContainer.innerHTML = `
+        questionsContainer.innerHTML = `
             <div style="text-align: center; padding: 2rem;">
                 <div class="loading"></div>
                 <p style="margin-top: 1rem; color: white;">Loading questions...</p>
             </div>
         `;
 
-            try {
-                console.log('Fetching from Firestore...');
-                const q = query(collection(db, 'questions'), orderBy('timestamp', 'desc'));
-                const querySnapshot = await getDocs(q);
+        try {
+            const querySnapshot = await db.collection('questions').orderBy('timestamp', 'desc').get();
 
-                console.log('Query snapshot size:', querySnapshot.size);
-
-                if (querySnapshot.empty) {
-                    questionsContainer.innerHTML = `
+            if (querySnapshot.empty) {
+                questionsContainer.innerHTML = `
                     <div style="text-align: center; padding: 2rem; color: white;">
                         <p style="opacity: 0.8;">No questions yet. Be the first to ask!</p>
                     </div>
                 `;
-                    isLoadingQuestions = false;
-                    return;
-                }
+                isLoadingQuestions = false;
+                return;
+            }
 
-                // Process questions with better error handling
-                allQuestions = [];
-                querySnapshot.forEach((docSnapshot) => {
-                    try {
-                        const data = docSnapshot.data();
-                        console.log('Processing question:', docSnapshot.id, data);
-
-                        // Handle timestamp safely
-                        let date;
-                        if (data.timestamp) {
-                            if (data.timestamp.toDate) {
-                                date = data.timestamp.toDate();
-                            } else if (data.timestamp instanceof Date) {
-                                date = data.timestamp;
-                            } else {
-                                date = new Date(data.timestamp);
-                            }
-                        } else {
-                            date = new Date();
-                        }
-
-                        // Handle author data safely
-                        const author = data.author || { name: 'Anonymous', uid: '', email: '' };
-                        const isOwner = currentUser && currentUser.uid && author.uid && currentUser.uid === author.uid;
-
-                        allQuestions.push({
-                            id: docSnapshot.id,
-                            data: {
-                                ...data,
-                                author: author,
-                                upvotes: data.upvotes || 0,
-                                downvotes: data.downvotes || 0,
-                                votedBy: data.votedBy || [],
-                                answers: data.answers || [],
-                                comments: data.comments || []
-                            },
-                            date: date,
-                            isOwner: isOwner
-                        });
-                    } catch (err) {
-                        console.error('Error processing question:', docSnapshot.id, err);
+            allQuestions = [];
+            querySnapshot.forEach((docSnapshot) => {
+                try {
+                    const data = docSnapshot.data();
+                    let date = new Date();
+                    
+                    if (data.timestamp && data.timestamp.toDate) {
+                        date = data.timestamp.toDate();
                     }
-                });
 
-                console.log('Processed questions:', allQuestions.length);
-                displayQuestions();
+                    const author = data.author || { name: 'Anonymous', uid: '', email: '' };
+                    const isOwner = currentUser && currentUser.uid && author.uid && currentUser.uid === author.uid;
 
-            } catch (error) {
-                console.error('Error loading questions:', error);
-                questionsContainer.innerHTML = `
+                    allQuestions.push({
+                        id: docSnapshot.id,
+                        data: {
+                            ...data,
+                            author: author,
+                            upvotes: data.upvotes || 0,
+                            downvotes: data.downvotes || 0,
+                            votedBy: data.votedBy || [],
+                            answers: data.answers || [],
+                            comments: data.comments || []
+                        },
+                        date: date,
+                        isOwner: isOwner
+                    });
+                } catch (err) {
+                    console.error('Error processing question:', err);
+                }
+            });
+
+            displayQuestions();
+
+        } catch (error) {
+            console.error('Error loading questions:', error);
+            questionsContainer.innerHTML = `
                 <div style="text-align: center; padding: 2rem;">
-                    <div style="background: rgba(255,107,107,0.2); backdrop-filter: blur(10px); padding: 2rem; border-radius: 15px; border: 1px solid rgba(255,107,107,0.3);">
-                        <p style="color: #ff6b6b; margin-bottom: 1rem; font-weight: 600;">⚠️ Error Loading Questions</p>
-                        <p style="color: white; opacity: 0.9; margin-bottom: 1rem;">${error.message}</p>
+                    <div style="background: rgba(255,107,107,0.2); backdrop-filter: blur(10px); padding: 2rem; border-radius: 15px;">
+                        <p style="color: #ff6b6b; margin-bottom: 1rem;">Error Loading Questions</p>
+                        <p style="color: white; opacity: 0.9;">${error.message}</p>
                         <button class="btn btn-primary" onclick="window.location.reload()">Refresh Page</button>
                     </div>
                 </div>
             `;
-            } finally {
-                isLoadingQuestions = false;
-            }
+        } finally {
+            isLoadingQuestions = false;
         }
+    }
 
-        // DISPLAY QUESTIONS - FIXED
-        function displayQuestions() {
-            try {
-                const questionsContainer = document.getElementById('questionsContainer');
+    function displayQuestions() {
+        try {
+            const questionsContainer = document.getElementById('questionsContainer');
 
-                if (allQuestions.length === 0) {
-                    questionsContainer.innerHTML = `
+            if (allQuestions.length === 0) {
+                questionsContainer.innerHTML = `
                     <div style="text-align: center; padding: 2rem; color: white;">
                         <p style="opacity: 0.8;">No questions yet. Be the first to ask!</p>
                     </div>
                 `;
-                    return;
-                }
+                return;
+            }
 
-                console.log('Displaying questions. Total:', allQuestions.length, 'Visible:', visibleQuestions);
+            let questionsHTML = '';
+            const questionsToShow = Math.min(visibleQuestions, allQuestions.length);
 
-                let questionsHTML = '';
-                const questionsToShow = Math.min(visibleQuestions, allQuestions.length);
+            for (let i = 0; i < questionsToShow; i++) {
+                const question = allQuestions[i];
+                question.isOwner = currentUser && currentUser.uid && question.data.author?.uid &&
+                    currentUser.uid === question.data.author.uid;
+                questionsHTML += createQuestionHTML(question.id, question.data, question.date, question.isOwner);
+            }
 
-                for (let i = 0; i < questionsToShow; i++) {
-                    const question = allQuestions[i];
-                    // Update ownership for current user
-                    question.isOwner = currentUser && currentUser.uid && question.data.author?.uid &&
-                        currentUser.uid === question.data.author.uid;
+            questionsContainer.innerHTML = questionsHTML;
 
-                    questionsHTML += createQuestionHTML(question.id, question.data, question.date, question.isOwner);
-                }
-
-                questionsContainer.innerHTML = questionsHTML;
-
-                // Add "See More" button if needed
-                if (visibleQuestions < allQuestions.length) {
-                    const remaining = allQuestions.length - visibleQuestions;
-                    questionsContainer.innerHTML += `
+            if (visibleQuestions < allQuestions.length) {
+                const remaining = allQuestions.length - visibleQuestions;
+                questionsContainer.innerHTML += `
                     <div style="text-align: center; margin: 2rem 0; padding: 2rem;">
-                        <button class="btn btn-primary" onclick="window.loadMoreQuestions()" id="seeMoreBtn">
+                        <button class="btn btn-primary" onclick="loadMoreQuestions()">
                             See More Questions (${remaining} remaining)
                         </button>
                     </div>
                 `;
-                }
-
-                console.log('Questions displayed successfully');
-            } catch (error) {
-                console.error('Error displaying questions:', error);
             }
+        } catch (error) {
+            console.error('Error displaying questions:', error);
         }
+    }
 
-        // LOAD MORE QUESTIONS
-        window.loadMoreQuestions = function () {
-            const btn = document.getElementById('seeMoreBtn');
-            if (btn) {
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<span class="loading"></span> Loading...';
-                btn.disabled = true;
+    function createQuestionHTML(questionId, data, date, isOwner) {
+        try {
+            const authorName = escapeHtml(data.author?.name || 'Anonymous');
+            const questionText = escapeHtml(data.question || '');
+            const userVote = currentUser && data.votedBy ?
+                data.votedBy.find(v => v.uid === currentUser.uid) : null;
+            const voteScore = (data.upvotes || 0) - (data.downvotes || 0);
 
-                setTimeout(() => {
-                    visibleQuestions += QUESTIONS_PER_LOAD;
-                    displayQuestions();
-                }, 300);
-            }
-        };
-
-        // CREATE QUESTION HTML - FIXED
-        function createQuestionHTML(questionId, data, date, isOwner) {
-            try {
-                const authorName = escapeHtml(data.author?.name || 'Anonymous');
-                const questionText = escapeHtml(data.question || '');
-                const userVote = currentUser && data.votedBy ?
-                    data.votedBy.find(v => v.uid === currentUser.uid) : null;
-                const voteScore = (data.upvotes || 0) - (data.downvotes || 0);
-
-                return `
+            return `
                 <div class="question-item" style="position: relative;">
                     <div class="question-header">
                         <div>
@@ -1927,32 +1852,32 @@
                                 ${data.comments?.length ? `<span>• ${data.comments.length} comments</span>` : ''}
                             </div>
                         </div>
-                        ${isOwner ? `<button class="delete-btn" onclick="window.deleteQuestion('${questionId}')">×</button>` : ''}
+                        ${isOwner ? `<button class="delete-btn" onclick="deleteQuestion('${questionId}')">×</button>` : ''}
                     </div>
                     
                     <div class="question-actions">
                         <div class="vote-buttons">
                             <button class="vote-btn ${userVote?.type === 'upvote' ? 'upvoted' : ''}" 
-                                    onclick="window.voteQuestion('${questionId}', 'upvote')"
+                                    onclick="voteQuestion('${questionId}', 'upvote')"
                                     ${!currentUser ? 'disabled title="Login to vote"' : ''}>
                                 ↑ ${data.upvotes || 0}
                             </button>
                             <span style="margin: 0 0.5rem; color: white;">Score: ${voteScore}</span>
                             <button class="vote-btn ${userVote?.type === 'downvote' ? 'downvoted' : ''}" 
-                                    onclick="window.voteQuestion('${questionId}', 'downvote')"
+                                    onclick="voteQuestion('${questionId}', 'downvote')"
                                     ${!currentUser ? 'disabled title="Login to vote"' : ''}>
                                 ↓ ${data.downvotes || 0}
                             </button>
                         </div>
-                        <button class="action-btn" onclick="window.toggleCommentForm('${questionId}')" 
+                        <button class="action-btn" onclick="toggleCommentForm('${questionId}')" 
                                 ${!currentUser ? 'disabled title="Login to comment"' : ''}>
                             💬 Comment
                         </button>
-                        <button class="action-btn" onclick="window.toggleAnswerForm('${questionId}')" 
+                        <button class="action-btn" onclick="toggleAnswerForm('${questionId}')" 
                                 ${!currentUser ? 'disabled title="Login to answer"' : ''}>
                             💡 Answer
                         </button>
-                        <button class="action-btn" onclick="window.flagQuestion('${questionId}')" 
+                        <button class="action-btn" onclick="flagQuestion('${questionId}')" 
                                 ${!currentUser ? 'disabled title="Login to flag"' : ''}>
                             🚩 Flag
                         </button>
@@ -1962,77 +1887,76 @@
                         <div id="commentForm-${questionId}" class="comment-form">
                             <textarea placeholder="Add a comment..." id="commentText-${questionId}"></textarea>
                             <div style="margin-top: 0.5rem;">
-                                <button class="btn btn-primary btn-small" onclick="window.submitComment('${questionId}')">Post Comment</button>
-                                <button class="btn btn-secondary btn-small" onclick="window.toggleCommentForm('${questionId}')">Cancel</button>
+                                <button class="btn btn-primary btn-small" onclick="submitComment('${questionId}')">Post Comment</button>
+                                <button class="btn btn-secondary btn-small" onclick="toggleCommentForm('${questionId}')">Cancel</button>
                             </div>
                         </div>
 
                         <div id="answerForm-${questionId}" class="answer-form">
                             <textarea placeholder="Write your answer..." id="answerText-${questionId}"></textarea>
                             <div style="margin-top: 0.5rem;">
-                                <button class="btn btn-primary btn-small" onclick="window.submitAnswer('${questionId}')">Post Answer</button>
-                                <button class="btn btn-secondary btn-small" onclick="window.toggleAnswerForm('${questionId}')">Cancel</button>
+                                <button class="btn btn-primary btn-small" onclick="submitAnswer('${questionId}')">Post Answer</button>
+                                <button class="btn btn-secondary btn-small" onclick="toggleAnswerForm('${questionId}')">Cancel</button>
                             </div>
                         </div>
                     ` : ''}
 
                    ${data.comments?.length ? createCommentsHTML(data.comments.map(c => ({ ...c, questionId }))) : ''}
-${data.answers?.length ? createAnswersHTML(data.answers.map(a => ({ ...a, questionId }))) : ''}
+                   ${data.answers?.length ? createAnswersHTML(data.answers.map(a => ({ ...a, questionId }))) : ''}
                 </div>
             `;
-            } catch (error) {
-                console.error('Error creating question HTML:', error);
-                return `<div class="question-item"><p style="color: white;">Error displaying question</p></div>`;
-            }
+        } catch (error) {
+            console.error('Error creating question HTML:', error);
+            return `<div class="question-item"><p style="color: white;">Error displaying question</p></div>`;
         }
+    }
 
-        function createCommentsHTML(comments) {
-            try {
-                let html = '<div class="comments-section"><h5 style="margin-bottom: 1rem; color: white;">Comments:</h5>';
-                comments.forEach((comment, index) => {
-                    const date = comment.timestamp?.toDate?.() || new Date();
-                    const authorName = escapeHtml(comment.author?.name || 'Anonymous');
-                    const commentText = escapeHtml(comment.text || '');
-                    const isOwner = currentUser && currentUser.uid && comment.author?.uid &&
-                        currentUser.uid === comment.author.uid;
+    function createCommentsHTML(comments) {
+        try {
+            let html = '<div class="comments-section"><h5 style="margin-bottom: 1rem; color: white;">Comments:</h5>';
+            comments.forEach((comment, index) => {
+                const date = comment.timestamp?.toDate?.() || new Date();
+                const authorName = escapeHtml(comment.author?.name || 'Anonymous');
+                const commentText = escapeHtml(comment.text || '');
+                const isOwner = currentUser && currentUser.uid && comment.author?.uid &&
+                    currentUser.uid === comment.author.uid;
 
-                    html += `
+                html += `
                 <div class="comment-item" style="position: relative;">
                     <p style="margin-bottom: 0.5rem; color: white; word-break: break-word; padding-right: ${isOwner ? '40px' : '0'};">${commentText}</p>
                     <small style="opacity: 0.8; color: rgba(255,255,255,0.7);">
                         By ${authorName} on ${date.toLocaleDateString()}
                     </small>
                     ${isOwner ? `
-                        <button class="delete-btn" onclick="window.deleteComment('${comment.questionId || ''}', ${index})" 
-                                style="position: absolute; top: 5px; right: 5px; width: 25px; height: 25px; font-size: 12px;"
-                                title="Delete comment">
+                        <button class="delete-btn" onclick="deleteComment('${comment.questionId || ''}', ${index})" 
+                                style="position: absolute; top: 5px; right: 5px; width: 25px; height: 25px; font-size: 12px;">
                             ×
                         </button>
                     ` : ''}
                 </div>
             `;
-                });
-                html += '</div>';
-                return html;
-            } catch (error) {
-                console.error('Error creating comments HTML:', error);
-                return '';
-            }
+            });
+            html += '</div>';
+            return html;
+        } catch (error) {
+            console.error('Error creating comments HTML:', error);
+            return '';
         }
+    }
 
-        function createAnswersHTML(answers) {
-            try {
-                let html = '<div class="answers-section"><h5 style="margin-bottom: 1rem; color: white;">Answers:</h5>';
-                answers.forEach((answer, index) => {
-                    const date = answer.timestamp?.toDate?.() || new Date();
-                    const authorName = escapeHtml(answer.author?.name || 'Anonymous');
-                    const answerText = escapeHtml(answer.text || '');
-                    const userVote = currentUser ? answer.votedBy?.find(v => v.uid === currentUser.uid) : null;
-                    const voteScore = (answer.upvotes || 0) - (answer.downvotes || 0);
-                    const isOwner = currentUser && currentUser.uid && answer.author?.uid &&
-                        currentUser.uid === answer.author.uid;
+    function createAnswersHTML(answers) {
+        try {
+            let html = '<div class="answers-section"><h5 style="margin-bottom: 1rem; color: white;">Answers:</h5>';
+            answers.forEach((answer, index) => {
+                const date = answer.timestamp?.toDate?.() || new Date();
+                const authorName = escapeHtml(answer.author?.name || 'Anonymous');
+                const answerText = escapeHtml(answer.text || '');
+                const userVote = currentUser ? answer.votedBy?.find(v => v.uid === currentUser.uid) : null;
+                const voteScore = (answer.upvotes || 0) - (answer.downvotes || 0);
+                const isOwner = currentUser && currentUser.uid && answer.author?.uid &&
+                    currentUser.uid === answer.author.uid;
 
-                    html += `
+                html += `
                 <div class="answer-item" style="position: relative;">
                     <p style="margin-bottom: 1rem; color: white; word-break: break-word; padding-right: ${isOwner ? '40px' : '0'};">${answerText}</p>
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
@@ -2041,52 +1965,264 @@ ${data.answers?.length ? createAnswersHTML(data.answers.map(a => ({ ...a, questi
                         </small>
                         <div class="vote-buttons">
                             <button class="vote-btn ${userVote?.type === 'upvote' ? 'upvoted' : ''}" 
+                                    onclick="voteAnswer('${answer.questionId || ''}', ${index}, 'upvote')"
                                     ${!currentUser ? 'disabled' : ''}>
                                 ↑ ${answer.upvotes || 0}
                             </button>
                             <span style="margin: 0 0.5rem; color: white;">Score: ${voteScore}</span>
                             <button class="vote-btn ${userVote?.type === 'downvote' ? 'downvoted' : ''}" 
+                                    onclick="voteAnswer('${answer.questionId || ''}', ${index}, 'downvote')"
                                     ${!currentUser ? 'disabled' : ''}>
                                 ↓ ${answer.downvotes || 0}
                             </button>
                         </div>
                     </div>
                     ${isOwner ? `
-                        <button class="delete-btn" onclick="window.deleteAnswer('${answer.questionId || ''}', ${index})" 
-                                style="position: absolute; top: 5px; right: 5px; width: 25px; height: 25px; font-size: 12px;"
-                                title="Delete answer">
+                        <button class="delete-btn" onclick="deleteAnswer('${answer.questionId || ''}', ${index})" 
+                                style="position: absolute; top: 5px; right: 5px; width: 25px; height: 25px; font-size: 12px;">
                             ×
                         </button>
                     ` : ''}
                 </div>
             `;
-                });
-                html += '</div>';
-                return html;
-            } catch (error) {
-                console.error('Error creating answers HTML:', error);
-                return '';
-            }
+            });
+            html += '</div>';
+            return html;
+        } catch (error) {
+            console.error('Error creating answers HTML:', error);
+            return '';
         }
-        // INTERACTIVE FUNCTIONS - ALL FIXED
-        window.voteQuestion = async function (questionId, voteType) {
-            if (!currentUser) {
-                showMessage('Please login to vote', 'error', 'errorMessage');
+    }
+
+    // Interactive functions
+    window.voteQuestion = async function(questionId, voteType) {
+        if (!currentUser) {
+            showMessage('Please login to vote', 'error', 'errorMessage');
+            return;
+        }
+
+        try {
+            const questionRef = db.collection('questions').doc(questionId);
+            const questionSnap = await questionRef.get();
+
+            if (questionSnap.exists) {
+                const data = questionSnap.data();
+                const votedBy = data.votedBy || [];
+                const existingVote = votedBy.find(v => v.uid === currentUser.uid);
+
+                let newVotedBy = [...votedBy];
+                let upvotes = data.upvotes || 0;
+                let downvotes = data.downvotes || 0;
+
+                if (existingVote) {
+                    newVotedBy = newVotedBy.filter(v => v.uid !== currentUser.uid);
+                    if (existingVote.type === 'upvote') upvotes--;
+                    else downvotes--;
+                }
+
+                if (!existingVote || existingVote.type !== voteType) {
+                    newVotedBy.push({ uid: currentUser.uid, type: voteType });
+                    if (voteType === 'upvote') upvotes++;
+                    else downvotes++;
+                }
+
+                await questionRef.update({
+                    votedBy: newVotedBy,
+                    upvotes: upvotes,
+                    downvotes: downvotes
+                });
+
+                const questionIndex = allQuestions.findIndex(q => q.id === questionId);
+                if (questionIndex !== -1) {
+                    allQuestions[questionIndex].data.votedBy = newVotedBy;
+                    allQuestions[questionIndex].data.upvotes = upvotes;
+                    allQuestions[questionIndex].data.downvotes = downvotes;
+                    displayQuestions();
+                }
+            }
+        } catch (error) {
+            console.error('Error voting:', error);
+            showMessage('Error voting. Please try again.', 'error', 'errorMessage');
+        }
+    };
+
+    window.toggleCommentForm = function(questionId) {
+        try {
+            const form = document.getElementById(`commentForm-${questionId}`);
+            if (form) {
+                const isVisible = form.style.display === 'block' || form.classList.contains('show');
+
+                if (isVisible) {
+                    form.style.display = 'none';
+                    form.classList.remove('show');
+                } else {
+                    form.style.display = 'block';
+                    form.classList.add('show');
+                    const textarea = form.querySelector('textarea');
+                    if (textarea) {
+                        setTimeout(() => textarea.focus(), 100);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error toggling comment form:', error);
+        }
+    };
+
+    window.toggleAnswerForm = function(questionId) {
+        try {
+            const form = document.getElementById(`answerForm-${questionId}`);
+            if (form) {
+                const isVisible = form.style.display === 'block' || form.classList.contains('show');
+
+                if (isVisible) {
+                    form.style.display = 'none';
+                    form.classList.remove('show');
+                } else {
+                    form.style.display = 'block';
+                    form.classList.add('show');
+                    const textarea = form.querySelector('textarea');
+                    if (textarea) {
+                        setTimeout(() => textarea.focus(), 100);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error toggling answer form:', error);
+        }
+    };
+
+    window.submitComment = async function(questionId) {
+        if (!currentUser) {
+            showMessage('Please login to comment', 'error', 'errorMessage');
+            return;
+        }
+
+        try {
+            const textarea = document.getElementById(`commentText-${questionId}`);
+            if (!textarea) return;
+
+            const commentText = textarea.value.trim();
+            if (!commentText) {
+                showMessage('Please enter a comment', 'error', 'errorMessage');
                 return;
             }
 
-            try {
-                const questionRef = doc(db, 'questions', questionId);
-                const questionSnap = await getDoc(questionRef);
+            const questionRef = db.collection('questions').doc(questionId);
+            const questionSnap = await questionRef.get();
 
-                if (questionSnap.exists()) {
-                    const data = questionSnap.data();
-                    const votedBy = data.votedBy || [];
+            if (!questionSnap.exists) {
+                throw new Error('Question not found');
+            }
+
+            const questionData = questionSnap.data();
+            const currentComments = questionData.comments || [];
+
+            const newComment = {
+                text: commentText,
+                author: {
+                    uid: currentUser.uid,
+                    name: currentUser.displayName || currentUser.email.split('@')[0],
+                    email: currentUser.email
+                },
+                timestamp: firebase.firestore.Timestamp.now()
+            };
+
+            await questionRef.update({
+                comments: [...currentComments, newComment]
+            });
+
+            textarea.value = '';
+            toggleCommentForm(questionId);
+            showMessage('Comment added successfully!', 'success', 'successMessage');
+
+            setTimeout(() => {
+                loadQuestions();
+            }, 1000);
+
+        } catch (error) {
+            console.error('Error adding comment:', error);
+            showMessage('Error adding comment: ' + error.message, 'error', 'errorMessage');
+        }
+    };
+
+    window.submitAnswer = async function(questionId) {
+        if (!currentUser) {
+            showMessage('Please login to answer', 'error', 'errorMessage');
+            return;
+        }
+
+        try {
+            const textarea = document.getElementById(`answerText-${questionId}`);
+            if (!textarea) return;
+
+            const answerText = textarea.value.trim();
+            if (!answerText) {
+                showMessage('Please enter an answer', 'error', 'errorMessage');
+                return;
+            }
+
+            const questionRef = db.collection('questions').doc(questionId);
+            const questionSnap = await questionRef.get();
+
+            if (!questionSnap.exists) {
+                throw new Error('Question not found');
+            }
+
+            const questionData = questionSnap.data();
+            const currentAnswers = questionData.answers || [];
+
+            const newAnswer = {
+                text: answerText,
+                author: {
+                    uid: currentUser.uid,
+                    name: currentUser.displayName || currentUser.email.split('@')[0],
+                    email: currentUser.email
+                },
+                timestamp: firebase.firestore.Timestamp.now(),
+                upvotes: 0,
+                downvotes: 0,
+                votedBy: [],
+                comments: []
+            };
+
+            await questionRef.update({
+                answers: [...currentAnswers, newAnswer]
+            });
+
+            textarea.value = '';
+            toggleAnswerForm(questionId);
+            showMessage('Answer posted successfully!', 'success', 'successMessage');
+
+            setTimeout(() => {
+                loadQuestions();
+            }, 1000);
+
+        } catch (error) {
+            console.error('Error adding answer:', error);
+            showMessage('Error adding answer: ' + error.message, 'error', 'errorMessage');
+        }
+    };
+
+    window.voteAnswer = async function(questionId, answerIndex, voteType) {
+        if (!currentUser) return;
+
+        try {
+            const questionRef = db.collection('questions').doc(questionId);
+            const questionSnap = await questionRef.get();
+
+            if (questionSnap.exists) {
+                const data = questionSnap.data();
+                const answers = data.answers || [];
+                
+                if (answerIndex < answers.length) {
+                    const answer = answers[answerIndex];
+                    const votedBy = answer.votedBy || [];
                     const existingVote = votedBy.find(v => v.uid === currentUser.uid);
 
                     let newVotedBy = [...votedBy];
-                    let upvotes = data.upvotes || 0;
-                    let downvotes = data.downvotes || 0;
+                    let upvotes = answer.upvotes || 0;
+                    let downvotes = answer.downvotes || 0;
 
                     if (existingVote) {
                         newVotedBy = newVotedBy.filter(v => v.uid !== currentUser.uid);
@@ -2100,461 +2236,238 @@ ${data.answers?.length ? createAnswersHTML(data.answers.map(a => ({ ...a, questi
                         else downvotes++;
                     }
 
-                    await updateDoc(questionRef, {
+                    answers[answerIndex] = {
+                        ...answer,
                         votedBy: newVotedBy,
                         upvotes: upvotes,
                         downvotes: downvotes
-                    });
+                    };
 
-                    // Update local data
-                    const questionIndex = allQuestions.findIndex(q => q.id === questionId);
-                    if (questionIndex !== -1) {
-                        allQuestions[questionIndex].data.votedBy = newVotedBy;
-                        allQuestions[questionIndex].data.upvotes = upvotes;
-                        allQuestions[questionIndex].data.downvotes = downvotes;
-                        displayQuestions();
-                    }
+                    await questionRef.update({ answers: answers });
+                    loadQuestions();
                 }
-            } catch (error) {
-                console.error('Error voting:', error);
-                showMessage('Error voting. Please try again.', 'error', 'errorMessage');
             }
-        };
+        } catch (error) {
+            console.error('Error voting on answer:', error);
+        }
+    };
 
-        // Find these functions around line 650+ in the Firebase script and REPLACE them:
+    window.flagQuestion = async function(questionId) {
+        if (!currentUser) return;
 
-        window.toggleCommentForm = function (questionId) {
+        if (confirm('Are you sure you want to flag this question as inappropriate?')) {
             try {
-                const form = document.getElementById(`commentForm-${questionId}`);
-                if (form) {
-                    const isVisible = form.style.display === 'block' || form.classList.contains('show');
+                const questionRef = db.collection('questions').doc(questionId);
+                await questionRef.update({
+                    flagged: true,
+                    flaggedBy: currentUser.uid,
+                    flaggedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
 
-                    if (isVisible) {
-                        form.style.display = 'none';
-                        form.classList.remove('show');
-                    } else {
-                        form.style.display = 'block';
-                        form.classList.add('show');
-                        const textarea = form.querySelector('textarea');
-                        if (textarea) {
-                            setTimeout(() => textarea.focus(), 100);
-                        }
-                    }
-                }
+                showMessage('Question flagged successfully.', 'success', 'successMessage');
             } catch (error) {
-                console.error('Error toggling comment form:', error);
+                console.error('Error flagging question:', error);
+                showMessage('Error flagging question. Please try again.', 'error', 'errorMessage');
             }
-        };
+        }
+    };
 
-        window.toggleAnswerForm = function (questionId) {
+    window.deleteQuestion = async function(questionId) {
+        if (!currentUser) return;
+
+        if (confirm('Are you sure you want to delete this question? This action cannot be undone.')) {
             try {
-                const form = document.getElementById(`answerForm-${questionId}`);
-                if (form) {
-                    const isVisible = form.style.display === 'block' || form.classList.contains('show');
-
-                    if (isVisible) {
-                        form.style.display = 'none';
-                        form.classList.remove('show');
-                    } else {
-                        form.style.display = 'block';
-                        form.classList.add('show');
-                        const textarea = form.querySelector('textarea');
-                        if (textarea) {
-                            setTimeout(() => textarea.focus(), 100);
-                        }
-                    }
-                }
+                await db.collection('questions').doc(questionId).delete();
+                allQuestions = allQuestions.filter(q => q.id !== questionId);
+                displayQuestions();
+                showMessage('Question deleted successfully.', 'success', 'successMessage');
             } catch (error) {
-                console.error('Error toggling answer form:', error);
+                console.error('Error deleting question:', error);
+                showMessage('Error deleting question. Please try again.', 'error', 'errorMessage');
             }
-        };
+        }
+    };
 
-        window.submitComment = async function (questionId) {
-            if (!currentUser) {
-                showMessage('Please login to comment', 'error', 'errorMessage');
+    window.deleteComment = async function(questionId, commentIndex) {
+        if (!currentUser) return;
+
+        if (!confirm('Are you sure you want to delete this comment?')) return;
+
+        try {
+            const questionRef = db.collection('questions').doc(questionId);
+            const questionSnap = await questionRef.get();
+
+            if (!questionSnap.exists) return;
+
+            const questionData = questionSnap.data();
+            const currentComments = questionData.comments || [];
+
+            if (commentIndex >= currentComments.length) return;
+
+            const comment = currentComments[commentIndex];
+            if (comment.author?.uid !== currentUser.uid) {
+                showMessage('You can only delete your own comments', 'error', 'errorMessage');
                 return;
             }
 
-            try {
-                const textarea = document.getElementById(`commentText-${questionId}`);
-                if (!textarea) {
-                    console.error('Comment textarea not found for question:', questionId);
-                    showMessage('Comment form not found', 'error', 'errorMessage');
-                    return;
-                }
+            const updatedComments = currentComments.filter((_, index) => index !== commentIndex);
 
-                const commentText = textarea.value.trim();
+            await questionRef.update({
+                comments: updatedComments
+            });
 
-                if (!commentText) {
-                    showMessage('Please enter a comment', 'error', 'errorMessage');
-                    return;
-                }
-
-                console.log('Submitting comment for question:', questionId);
-
-                const questionRef = doc(db, 'questions', questionId);
-                const questionSnap = await getDoc(questionRef);
-
-                if (!questionSnap.exists()) {
-                    throw new Error('Question not found');
-                }
-
-                const questionData = questionSnap.data();
-                const currentComments = questionData.comments || [];
-
-                const newComment = {
-                    text: commentText,
-                    author: {
-                        uid: currentUser.uid,
-                        name: currentUser.displayName || currentUser.email.split('@')[0],
-                        email: currentUser.email
-                    },
-                    timestamp: Timestamp.now()
-                };
-
-                const updatedComments = [...currentComments, newComment];
-
-                await updateDoc(questionRef, {
-                    comments: updatedComments
-                });
-
-                console.log('Comment added successfully');
-                textarea.value = '';
-                window.toggleCommentForm(questionId);
-                showMessage('Comment added successfully!', 'success', 'successMessage');
-
-                setTimeout(() => {
-                    loadQuestions();
-                }, 1000);
-
-            } catch (error) {
-                console.error('Error adding comment:', error);
-                showMessage('Error adding comment: ' + error.message, 'error', 'errorMessage');
-            }
-        };
-
-        window.submitAnswer = async function (questionId) {
-            if (!currentUser) {
-                showMessage('Please login to answer', 'error', 'errorMessage');
-                return;
-            }
-
-            try {
-                const textarea = document.getElementById(`answerText-${questionId}`);
-                if (!textarea) {
-                    console.error('Answer textarea not found for question:', questionId);
-                    showMessage('Answer form not found', 'error', 'errorMessage');
-                    return;
-                }
-
-                const answerText = textarea.value.trim();
-
-                if (!answerText) {
-                    showMessage('Please enter an answer', 'error', 'errorMessage');
-                    return;
-                }
-
-                console.log('Submitting answer for question:', questionId);
-
-                const questionRef = doc(db, 'questions', questionId);
-                const questionSnap = await getDoc(questionRef);
-
-                if (!questionSnap.exists()) {
-                    throw new Error('Question not found');
-                }
-
-                const questionData = questionSnap.data();
-                const currentAnswers = questionData.answers || [];
-
-                const newAnswer = {
-                    text: answerText,
-                    author: {
-                        uid: currentUser.uid,
-                        name: currentUser.displayName || currentUser.email.split('@')[0],
-                        email: currentUser.email
-                    },
-                    timestamp: Timestamp.now(),
-                    upvotes: 0,
-                    downvotes: 0,
-                    votedBy: [],
-                    comments: []
-                };
-
-                const updatedAnswers = [...currentAnswers, newAnswer];
-
-                await updateDoc(questionRef, {
-                    answers: updatedAnswers
-                });
-
-                console.log('Answer added successfully');
-                textarea.value = '';
-                window.toggleAnswerForm(questionId);
-                showMessage('Answer posted successfully!', 'success', 'successMessage');
-
-                setTimeout(() => {
-                    loadQuestions();
-                }, 1000);
-
-            } catch (error) {
-                console.error('Error adding answer:', error);
-                showMessage('Error adding answer: ' + error.message, 'error', 'errorMessage');
-            }
-        };
-
-        window.flagQuestion = async function (questionId) {
-            if (!currentUser) return;
-
-            if (confirm('Are you sure you want to flag this question as inappropriate?')) {
-                try {
-                    const questionRef = doc(db, 'questions', questionId);
-                    await updateDoc(questionRef, {
-                        flagged: true,
-                        flaggedBy: currentUser.uid,
-                        flaggedAt: serverTimestamp()
-                    });
-
-                    showMessage('Question flagged successfully.', 'success', 'successMessage');
-                } catch (error) {
-                    console.error('Error flagging question:', error);
-                    showMessage('Error flagging question. Please try again.', 'error', 'errorMessage');
-                }
-            }
-        };
-
-        window.deleteQuestion = async function (questionId) {
-            if (!currentUser) return;
-
-            if (confirm('Are you sure you want to delete this question? This action cannot be undone.')) {
-                try {
-                    await deleteDoc(doc(db, 'questions', questionId));
-                    allQuestions = allQuestions.filter(q => q.id !== questionId);
-                    displayQuestions();
-                    showMessage('Question deleted successfully.', 'success', 'successMessage');
-                } catch (error) {
-                    console.error('Error deleting question:', error);
-                    showMessage('Error deleting question. Please try again.', 'error', 'errorMessage');
-                }
-            }
-        };
-
-        // UTILITY FUNCTIONS
-        function escapeHtml(text) {
-            if (!text) return '';
-            try {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            } catch (error) {
-                return String(text).replace(/[&<>"']/g, function (s) {
-                    return {
-                        '&': '&amp;',
-                        '<': '&lt;',
-                        '>': '&gt;',
-                        '"': '&quot;',
-                        "'": '&#39;'
-                    }[s];
-                });
-            }
-        }
-
-        function showMessage(message, type, elementId) {
-            try {
-                const element = document.getElementById(elementId);
-                if (element) {
-                    element.textContent = message;
-                    element.style.display = 'block';
-                    setTimeout(() => {
-                        element.style.display = 'none';
-                    }, 5000);
-                }
-            } catch (error) {
-                console.error('Error showing message:', error);
-            }
-        }
-
-        function showAuthMessage(message, type) {
-            try {
-                const successMsg = document.getElementById('authSuccessMessage');
-                const errorMsg = document.getElementById('authErrorMessage');
-
-                if (type === 'success') {
-                    if (successMsg) {
-                        successMsg.textContent = message;
-                        successMsg.style.display = 'block';
-                    }
-                    if (errorMsg) errorMsg.style.display = 'none';
-                } else {
-                    if (errorMsg) {
-                        errorMsg.textContent = message;
-                        errorMsg.style.display = 'block';
-                    }
-                    if (successMsg) successMsg.style.display = 'none';
-                }
-
-                setTimeout(() => {
-                    if (successMsg) successMsg.style.display = 'none';
-                    if (errorMsg) errorMsg.style.display = 'none';
-                }, 5000);
-            } catch (error) {
-                console.error('Error showing auth message:', error);
-            }
-        }
-
-        function getFirebaseErrorMessage(error) {
-            switch (error.code) {
-                case 'auth/user-not-found':
-                    return 'No account found with this email address.';
-                case 'auth/wrong-password':
-                    return 'Incorrect password. Please try again.';
-                case 'auth/email-already-in-use':
-                    return 'An account with this email already exists.';
-                case 'auth/weak-password':
-                    return 'Password should be at least 6 characters long.';
-                case 'auth/invalid-email':
-                    return 'Please enter a valid email address.';
-                case 'auth/too-many-requests':
-                    return 'Too many failed attempts. Please try again later.';
-                case 'auth/network-request-failed':
-                    return 'Network error. Please check your connection.';
-                case 'auth/invalid-credential':
-                    return 'Invalid email or password.';
-                default:
-                    return error.message || 'An unexpected error occurred.';
-            }
-        }
-
-        // Initialize on page load - FIXED
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, Firebase initialized and ready!');
-
-            // Initial load of questions after a short delay
+            showMessage('Comment deleted successfully!', 'success', 'successMessage');
             setTimeout(() => {
-                if (!isLoadingQuestions) {
-                    loadQuestions();
-                }
+                loadQuestions();
             }, 1000);
-        });
 
-        // Also try to load questions when the window loads
-        window.addEventListener('load', () => {
+        } catch (error) {
+            console.error('Error deleting comment:', error);
+            showMessage('Error deleting comment: ' + error.message, 'error', 'errorMessage');
+        }
+    };
+
+    window.deleteAnswer = async function(questionId, answerIndex) {
+        if (!currentUser) return;
+
+        if (!confirm('Are you sure you want to delete this answer?')) return;
+
+        try {
+            const questionRef = db.collection('questions').doc(questionId);
+            const questionSnap = await questionRef.get();
+
+            if (!questionSnap.exists) return;
+
+            const questionData = questionSnap.data();
+            const currentAnswers = questionData.answers || [];
+
+            if (answerIndex >= currentAnswers.length) return;
+
+            const answer = currentAnswers[answerIndex];
+            if (answer.author?.uid !== currentUser.uid) {
+                showMessage('You can only delete your own answers', 'error', 'errorMessage');
+                return;
+            }
+
+            const updatedAnswers = currentAnswers.filter((_, index) => index !== answerIndex);
+
+            await questionRef.update({
+                answers: updatedAnswers
+            });
+
+            showMessage('Answer deleted successfully!', 'success', 'successMessage');
             setTimeout(() => {
-                if (!isLoadingQuestions && allQuestions.length === 0) {
-                    loadQuestions();
-                }
-            }, 1500);
-        });
+                loadQuestions();
+            }, 1000);
 
-        console.log('Firebase script loaded and initialized!');
-        // ADD this new function for deleting comments
-        window.deleteComment = async function (questionId, commentIndex) {
-            if (!currentUser) {
-                showMessage('Please login to delete comments', 'error', 'errorMessage');
-                return;
-            }
+        } catch (error) {
+            console.error('Error deleting answer:', error);
+            showMessage('Error deleting answer: ' + error.message, 'error', 'errorMessage');
+        }
+    };
 
-            if (!confirm('Are you sure you want to delete this comment? This action cannot be undone.')) {
-                return;
-            }
+    window.loadMoreQuestions = function() {
+        const btn = document.getElementById('seeMoreBtn');
+        if (btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loading"></span> Loading...';
+            btn.disabled = true;
 
-            try {
-                console.log('Deleting comment:', questionId, commentIndex);
+            setTimeout(() => {
+                visibleQuestions += QUESTIONS_PER_LOAD;
+                displayQuestions();
+            }, 300);
+        }
+    };
 
-                const questionRef = doc(db, 'questions', questionId);
-                const questionSnap = await getDoc(questionRef);
+    // Utility functions
+    function escapeHtml(text) {
+        if (!text) return '';
+        try {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        } catch (error) {
+            return String(text).replace(/[&<>"']/g, function(s) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[s];
+            });
+        }
+    }
 
-                if (!questionSnap.exists()) {
-                    throw new Error('Question not found');
-                }
-
-                const questionData = questionSnap.data();
-                const currentComments = questionData.comments || [];
-
-                // Check if the comment exists and user owns it
-                if (commentIndex >= currentComments.length) {
-                    throw new Error('Comment not found');
-                }
-
-                const comment = currentComments[commentIndex];
-                if (comment.author?.uid !== currentUser.uid) {
-                    throw new Error('You can only delete your own comments');
-                }
-
-                // Remove the comment at the specified index
-                const updatedComments = currentComments.filter((_, index) => index !== commentIndex);
-
-                await updateDoc(questionRef, {
-                    comments: updatedComments
-                });
-
-                showMessage('Comment deleted successfully!', 'success', 'successMessage');
-
-                // Reload questions
+    function showMessage(message, type, elementId) {
+        try {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.style.display = 'block';
                 setTimeout(() => {
-                    loadQuestions();
-                }, 1000);
-
-            } catch (error) {
-                console.error('Error deleting comment:', error);
-                showMessage('Error deleting comment: ' + error.message, 'error', 'errorMessage');
+                    element.style.display = 'none';
+                }, 5000);
             }
-        };
+        } catch (error) {
+            console.error('Error showing message:', error);
+        }
+    }
 
-        // ADD this new function for deleting answers
-        window.deleteAnswer = async function (questionId, answerIndex) {
-            if (!currentUser) {
-                showMessage('Please login to delete answers', 'error', 'errorMessage');
-                return;
-            }
+    function showAuthMessage(message, type) {
+        try {
+            const successMsg = document.getElementById('authSuccessMessage');
+            const errorMsg = document.getElementById('authErrorMessage');
 
-            if (!confirm('Are you sure you want to delete this answer? This action cannot be undone.')) {
-                return;
-            }
-
-            try {
-                console.log('Deleting answer:', questionId, answerIndex);
-
-                const questionRef = doc(db, 'questions', questionId);
-                const questionSnap = await getDoc(questionRef);
-
-                if (!questionSnap.exists()) {
-                    throw new Error('Question not found');
+            if (type === 'success') {
+                if (successMsg) {
+                    successMsg.textContent = message;
+                    successMsg.style.display = 'block';
                 }
-
-                const questionData = questionSnap.data();
-                const currentAnswers = questionData.answers || [];
-
-                // Check if the answer exists and user owns it
-                if (answerIndex >= currentAnswers.length) {
-                    throw new Error('Answer not found');
+                if (errorMsg) errorMsg.style.display = 'none';
+            } else {
+                if (errorMsg) {
+                    errorMsg.textContent = message;
+                    errorMsg.style.display = 'block';
                 }
-
-                const answer = currentAnswers[answerIndex];
-                if (answer.author?.uid !== currentUser.uid) {
-                    throw new Error('You can only delete your own answers');
-                }
-
-                // Remove the answer at the specified index
-                const updatedAnswers = currentAnswers.filter((_, index) => index !== answerIndex);
-
-                await updateDoc(questionRef, {
-                    answers: updatedAnswers
-                });
-
-                showMessage('Answer deleted successfully!', 'success', 'successMessage');
-
-                // Reload questions
-                setTimeout(() => {
-                    loadQuestions();
-                }, 1000);
-
-            } catch (error) {
-                console.error('Error deleting answer:', error);
-                showMessage('Error deleting answer: ' + error.message, 'error', 'errorMessage');
+                if (successMsg) successMsg.style.display = 'none';
             }
-        };
 
-    </script>
+            setTimeout(() => {
+                if (successMsg) successMsg.style.display = 'none';
+                if (errorMsg) errorMsg.style.display = 'none';
+            }, 5000);
+        } catch (error) {
+            console.error('Error showing auth message:', error);
+        }
+    }
 
+    function getFirebaseErrorMessage(error) {
+        switch (error.code) {
+            case 'auth/user-not-found':
+                return 'No account found with this email address.';
+            case 'auth/wrong-password':
+                return 'Incorrect password. Please try again.';
+            case 'auth/email-already-in-use':
+                return 'An account with this email already exists.';
+            case 'auth/weak-password':
+                return 'Password should be at least 6 characters long.';
+            case 'auth/invalid-email':
+                return 'Please enter a valid email address.';
+            case 'auth/too-many-requests':
+                return 'Too many failed attempts. Please try again later.';
+            case 'auth/network-request-failed':
+                return 'Network error. Please check your connection.';
+            case 'auth/invalid-credential':
+                return 'Invalid email or password.';
+            default:
+                return error.message || 'An unexpected error occurred.';
+        }
+    }
+
+    console.log('Firebase script loaded and initialized!');
+</script>
     <script>
         // Mobile menu toggle
         document.getElementById('mobileMenuBtn').addEventListener('click', function () {
