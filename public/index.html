@@ -1072,6 +1072,74 @@
         .answer-item:hover {
             background: rgba(255, 255, 255, 0.08);
         }
+      /* Add this CSS to fix the research paper buttons */
+
+/* Override the existing button styles specifically for research paper section */
+.research-papers .btn {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-size: 0.9rem;
+    min-width: 100px;
+    text-align: center;
+}
+
+/* Primary button styling */
+.research-papers .btn-primary {
+    background: rgba(102, 126, 234, 0.1) !important;
+    color: #667eea !important;
+    border: 2px solid rgba(102, 126, 234, 0.3) !important;
+}
+
+.research-papers .btn-primary:hover {
+    background: rgba(102, 126, 234, 0.9) !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Secondary button styling */
+.research-papers .btn-secondary {
+    background: transparent !important;
+    color: #667eea !important;
+    border: 2px solid #667eea !important;
+}
+
+.research-papers .btn-secondary:hover {
+    background: #667eea !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Ensure the container div has proper display */
+.research-papers .paper-item > div {
+    display: flex !important;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .research-papers .paper-item > div {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .research-papers .btn {
+        width: 100%;
+        min-width: auto;
+    }
+}
     </style>
 </head>
 
@@ -1297,22 +1365,29 @@
     </section>
 
     <!-- Research Papers Section -->
-    <section id="research" class="section">
-        <div class="research-papers animate-on-scroll">
-            <h2 class="section-title">Research Papers</h2>
-            <div style="text-align: center; color: #666; font-size: 1.1rem; margin: 2rem 0;">
-                <p>Research publications and papers will be updated here as they become available.</p>
-                <p style="margin-top: 1rem; font-style: italic;">Stay tuned for upcoming research contributions in
-                    database systems and computer science!</p>
-            </div>
+<section id="research" class="section">
+    <div class="research-papers animate-on-scroll">
+        <h2 class="section-title">Research Papers</h2>
+        <div style="text-align: center; color: #666; font-size: 1.1rem; margin: 2rem 0;">
+            <p>Explore my research work in database systems and computer science.</p>
+        </div>
 
-            <div class="paper-item" style="opacity: 0.7;">
-                <h4 style="color: #764ba2; margin-bottom: 0.5rem;">Upcoming Research Work</h4>
-                <p style="color: #666;">Research papers and publications will be added here as they are completed and
-                    published.</p>
+        <div class="paper-item">
+            <h4 style="color: #764ba2; margin-bottom: 0.5rem;">Plan Bouquet: Robust Query Processing</h4>
+            <p style="color: #666; margin-bottom: 1rem;">A comprehensive study on robust database query optimization using plan bouquets to handle selectivity estimation errors. This research presents mathematical foundations and algorithms for maintaining query performance guarantees even when optimizer estimates are incorrect.</p>
+            <p style="color: #888; font-size: 0.9rem; margin-bottom: 1rem;"><strong>Topics:</strong> Query Optimization, Selectivity Estimation, Parametric Optimization, Performance Guarantees</p>
+            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                <a href="plan_bouquet.html" class="btn btn-primary btn-small" target="_blank">Interactive Explanation</a>
+                <a href="Plan_bouquet.pdf" class="btn btn-secondary btn-small" target="_blank">View PDF</a>
             </div>
         </div>
-    </section>
+
+        <div class="paper-item" style="opacity: 0.7;">
+            <h4 style="color: #764ba2; margin-bottom: 0.5rem;">Upcoming Research Work</h4>
+            <p style="color: #666;">Additional research papers and publications will be added here as they are completed and published.</p>
+        </div>
+    </div>
+</section>
 
     <!-- Q&A Section -->
     <section id="qa" class="section">

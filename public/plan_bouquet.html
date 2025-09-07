@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Bouquet: Complete Mathematical Guide</title>
+    <link rel="icon" type="image/png" href="my_logo.png">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1, h2, h3 {
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .math-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #4ecdc4;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .formula {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        
+        .step {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 5px;
+            font-weight: bold;
+        }
+        
+        .visualization {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            min-height: 300px;
+            text-align: center;
+        }
+        
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            padding: 12px 25px;
+            margin: 5px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .problem-example {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .example-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Plan Bouquet Query Processing</h1>
+        <p style="text-align: center; font-size: 1.2em; opacity: 0.9;">
+            Complete Mathematical Guide to Robust Database Query Optimization
+        </p>
+        
+        <div class="controls">
+            <button onclick="showSection('problem')">The Problem</button>
+            <button onclick="showSection('math')">Mathematical Foundation</button>
+            <button onclick="showSection('algorithm')">Algorithm Details</button>
+            <button onclick="showSection('visualization')">Interactive Demo</button>
+        </div>
+        
+        <!-- Problem Section -->
+        <div id="problem-section" class="section">
+            <h2>The Core Problem: Selectivity Estimation Errors</h2>
+            
+            <div class="math-box">
+                <h3>What is Selectivity?</h3>
+                <p><strong>Selectivity</strong> is the fraction of rows that satisfy a query condition:</p>
+                <div class="formula">
+                    Selectivity = Number of matching rows / Total number of rows
+                </div>
+                <p>Example: If a table has 1,000,000 rows and a WHERE clause matches 50,000 rows, selectivity = 0.05 (5%)</p>
+            </div>
+            
+            <div class="problem-example">
+                <div class="example-box">
+                    <h4>Traditional Optimizer Problem</h4>
+                    <p><span class="step">Step 1</span> Optimizer estimates: "This query will process 1,000 rows"</p>
+                    <p><span class="step">Step 2</span> Chooses Plan A (good for small result sets)</p>
+                    <p><span class="step">Step 3</span> Reality: Query actually processes 100,000 rows!</p>
+                    <p><span class="step">Result</span> Plan A becomes 100x slower than optimal</p>
+                </div>
+                
+                <div class="example-box">
+                    <h4>Plan Bouquet Solution</h4>
+                    <p><span class="step">Step 1</span> Prepare multiple plans for different scenarios</p>
+                    <p><span class="step">Step 2</span> Try plans in order, switching when budget exceeded</p>
+                    <p><span class="step">Step 3</span> Discover actual selectivity through execution</p>
+                    <p><span class="step">Result</span> Never more than 4x slower than optimal!</p>
+                </div>
+            </div>
+            
+            <div class="math-box">
+                <h3>Why Estimation Errors Occur</h3>
+                <ul>
+                    <li><strong>Outdated Statistics:</strong> Data has changed since last analysis</li>
+                    <li><strong>Independence Assumptions:</strong> Optimizer assumes predicates are independent</li>
+                    <li><strong>Complex Predicates:</strong> User-defined functions, regex patterns</li>
+                    <li><strong>Join Selectivity:</strong> Hard to predict how many rows will match between tables</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Mathematical Foundation Section -->
+        <div id="math-section" class="section hidden">
+            <h2>Mathematical Foundation</h2>
+            
+            <div class="math-box">
+                <h3>1. Problem Formalization</h3>
+                <p>Let's define the key mathematical concepts:</p>
+                
+                <h4>Error-Prone Selectivity Space (ESS)</h4>
+                <div class="formula">
+                    ESS: D-dimensional space where each dimension represents one error-prone predicate
+                </div>
+                <p>Each point q(s₁, s₂, ..., sᴅ) represents a query with specific selectivities</p>
+                
+                <h4>Sub-optimality Ratio</h4>
+                <div class="formula">
+                    SubOpt(qₑ, qₐ) = cost_chosen_plan(qₐ) / cost_optimal_plan(qₐ)
+                </div>
+                <p>Where:</p>
+                <ul>
+                    <li>qₑ = estimated query location (where optimizer thinks we are)</li>
+                    <li>qₐ = actual query location (where we really are)</li>
+                    <li>Ratio = 1 means optimal, ratio = 10 means 10x slower than optimal</li>
+                </ul>
+            </div>
+            
+            <div class="math-box">
+                <h3>2. POSP and PIC Construction</h3>
+                
+                <h4>Parametric Optimal Set of Plans (POSP)</h4>
+                <p>For each location in selectivity space, we find the optimal plan. This gives us POSP.</p>
+                
+                <h4>POSP Infimum Curve (PIC)</h4>
+                <div class="formula">
+                    PIC(s) = min{cost_plan_i(s) | plan_i ∈ POSP}
+                </div>
+                <p>PIC represents the ideal performance - the best possible cost at each selectivity</p>
+            </div>
+            
+            <div class="math-box">
+                <h3>3. Isocost Surface Construction</h3>
+                
+                <h4>Geometric Progression of Isocost Lines</h4>
+                <p>We create budget levels that double each time:</p>
+                <div class="formula">
+                    IC₁ = a, IC₂ = 2a, IC₃ = 4a, IC₄ = 8a, ..., ICₖ = a × 2^(k-1)
+                </div>
+                
+                <h4>Why Doubling?</h4>
+                <p>This ensures optimal competitive ratio. The paper proves that doubling gives the best possible guarantee of 4x optimal cost.</p>
+            </div>
+            
+            <div class="math-box">
+                <h3>4. Performance Guarantee Proof</h3>
+                
+                <h4>1D Case Theorem</h4>
+                <p>If actual location qₐ lies between ICₖ₋₁ and ICₖ, then:</p>
+                
+                <div class="formula">
+                    Total cost = IC₁ + IC₂ + ... + ICₖ = a(2ᵏ - 1)/(2 - 1) = a(2ᵏ - 1)
+                </div>
+                
+                <div class="formula">
+                    Optimal cost ≥ ICₖ₋₂ = a × 2^(k-2)
+                </div>
+                
+                <div class="formula">
+                    Ratio = a(2ᵏ - 1) / (a × 2^(k-2)) = (2ᵏ - 1) / 2^(k-2) = 2² - 2^(2-k) ≤ 4
+                </div>
+                
+                <h4>Multi-Dimensional Case</h4>
+                <div class="formula">
+                    MSO ≤ 4 × ρ
+                </div>
+                <p>Where ρ = maximum number of plans on any isocost surface</p>
+            </div>
+        </div>
+        
+        <!-- Algorithm Section -->
+        <div id="algorithm-section" class="section hidden">
+            <h2>Bouquet Algorithm Details</h2>
+            
+            <div class="math-box">
+                <h3>Compile-Time Phase</h3>
+                <div class="step">Step 1: Identify Error-Prone Dimensions</div>
+                <p>Determine which predicates have unreliable selectivity estimates</p>
+                
+                <div class="step">Step 2: Generate POSP</div>
+                <p>For each point in selectivity space, find optimal plan using repeated optimizer calls</p>
+                
+                <div class="step">Step 3: Create Isocost Surfaces</div>
+                <p>Project geometric progression of budget levels onto the cost surface</p>
+                
+                <div class="step">Step 4: Select Bouquet Plans</div>
+                <p>Choose plans that intersect with isocost surfaces</p>
+            </div>
+            
+            <div class="math-box">
+                <h3>Run-Time Algorithm (Simplified)</h3>
+                <pre>
+bouquet_execution(query):
+    current_budget = IC₁
+    for each isocost_level k = 1 to max_levels:
+        for each plan P in bouquet_plans[k]:
+            execute P with budget = current_budget
+            if P completes within budget:
+                return P.result
+            else:
+                record intermediate results
+        current_budget = IC_{k+1}  // Double the budget
+    
+    return "Query too expensive"
+                </pre>
+            </div>
+            
+            <div class="math-box">
+                <h3>Key Optimizations</h3>
+                
+                <h4>1. Selectivity Learning</h4>
+                <p>As we execute plans, we learn actual selectivities:</p>
+                <div class="formula">
+                    actual_selectivity = tuples_processed / total_tuples_in_relation
+                </div>
+                
+                <h4>2. Plan Elimination</h4>
+                <p>Use learned selectivities to eliminate obviously suboptimal plans</p>
+                
+                <h4>3. Spilled Execution</h4>
+                <p>Break pipelines after error-prone operators to focus budget on learning</p>
+            </div>
+        </div>
+        
+        <!-- Visualization Section -->
+        <div id="visualization-section" class="section hidden">
+            <h2>Interactive Demonstration</h2>
+            
+            <div class="visualization">
+                <h3>1D Plan Bouquet Example</h3>
+                <canvas id="demo-canvas" width="800" height="400"></canvas>
+                <div class="controls">
+                    <button onclick="animateDemo()">▶ Run Animation</button>
+                    <button onclick="resetDemo()">🔄 Reset</button>
+                </div>
+                <div id="demo-log" style="text-align: left; margin-top: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px;">
+                    <h4>Execution Log:</h4>
+                    <div id="log-content">Click "Run Animation" to see the bouquet algorithm in action!</div>
+                </div>
+            </div>
+            
+            <div class="math-box">
+                <h3>What You're Seeing</h3>
+                <ul>
+                    <li><strong>Blue Curve:</strong> PIC (optimal performance at each selectivity)</li>
+                    <li><strong>Yellow Dashed Lines:</strong> Isocost budgets (IC₁, IC₂, IC₃, IC₄)</li>
+                    <li><strong>Red Circles:</strong> Bouquet plans (intersection points)</li>
+                    <li><strong>Green Arrow:</strong> Actual query location</li>
+                    <li><strong>Animation:</strong> Shows plan execution sequence and budget usage</li>
+                </ul>
+            </div>
+            
+            <div class="problem-example">
+                <div class="example-box">
+                    <h4>Traditional Optimizer</h4>
+                    <p>Estimates selectivity = 1%</p>
+                    <p>Chooses Plan P1 (optimal for 1%)</p>
+                    <p>Actual selectivity = 10%</p>
+                    <p><strong>Result:</strong> 50x slower than optimal!</p>
+                </div>
+                
+                <div class="example-box">
+                    <h4>Plan Bouquet</h4>
+                    <p>Try P1 with budget IC₁ → Exceeds</p>
+                    <p>Try P2 with budget IC₂ → Exceeds</p>
+                    <p>Try P3 with budget IC₃ → Success!</p>
+                    <p><strong>Result:</strong> Only 2.8x slower than optimal</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentSection = 'problem';
+        let animationRunning = false;
+        let currentSelectivity = 5.0;
+        let animationId;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('problem');
+        });
+        
+        function showSection(section) {
+            const sections = ['problem', 'math', 'algorithm', 'visualization'];
+            sections.forEach(s => {
+                const element = document.getElementById(s + '-section');
+                if (element) element.classList.add('hidden');
+            });
+            
+            const targetSection = document.getElementById(section + '-section');
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                currentSection = section;
+                if (section === 'visualization') initCanvas();
+            }
+        }
+        
+        function updateSelectivity() {
+            currentSelectivity = parseFloat(document.getElementById('selectivity-slider').value);
+            document.getElementById('selectivity-value').textContent = currentSelectivity.toFixed(1) + '%';
+            if (!animationRunning) drawStaticVisualization();
+        }
+        
+        function initCanvas() {
+            drawStaticVisualization();
+        }
+        
+        function drawStaticVisualization() {
+            const canvas = document.getElementById('demo-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const margin = 60;
+            const chartWidth = canvas.width - 2 * margin;
+            const chartHeight = canvas.height - 2 * margin;
+            
+            // Axes
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(margin, margin);
+            ctx.lineTo(margin, canvas.height - margin);
+            ctx.lineTo(canvas.width - margin, canvas.height - margin);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = 'white';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Selectivity (%)', canvas.width/2, canvas.height - 20);
+            
+            // Y-axis label
+            ctx.save();
+            ctx.translate(20, canvas.height/2);
+            ctx.rotate(-Math.PI/2);
+            ctx.fillText('Query Cost (units)', 0, 0);
+            ctx.restore();
+            
+            // Scale markers
+            ctx.font = '10px Arial';
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            for (let i = 0; i <= 15; i += 5) {
+                const x = margin + (i/15) * chartWidth;
+                ctx.fillText(i + '%', x, canvas.height - 35);
+            }
+            
+            // PIC curve (blue)
+            ctx.strokeStyle = '#4ecdc4';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            for (let x = margin; x < canvas.width - margin; x += 2) {
+                const selectivity = ((x - margin) / chartWidth) * 15;
+                const cost = 50 + Math.pow(selectivity + 0.5, 1.8) * 40;
+                const y = canvas.height - margin - cost;
+                if (x === margin) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            
+            // Isocost lines
+            const baseCost = 100;
+            ctx.strokeStyle = '#ffd93d';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 4]);
+            
+            const costs = [baseCost, baseCost*2, baseCost*4, baseCost*8];
+            costs.forEach((cost, i) => {
+                const y = canvas.height - margin - cost;
+                if (y > margin + 20) {
+                    ctx.beginPath();
+                    ctx.moveTo(margin, y);
+                    ctx.lineTo(canvas.width - margin, y);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#ffd93d';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(`IC${i+1} (${cost})`, margin + 10, y - 5);
+                }
+            });
+            ctx.setLineDash([]);
+            
+            // Bouquet plans
+            ctx.fillStyle = '#ff6b6b';
+            const planData = [
+                {x: 2, cost: baseCost, name: 'P1'},
+                {x: 4, cost: baseCost*2, name: 'P2'},
+                {x: 7, cost: baseCost*4, name: 'P3'},
+                {x: 12, cost: baseCost*8, name: 'P4'}
+            ];
+            
+            planData.forEach(plan => {
+                const x = margin + (plan.x/15) * chartWidth;
+                const y = canvas.height - margin - plan.cost;
+                if (y > margin + 20) {
+                    ctx.beginPath();
+                    ctx.arc(x, y, 8, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(plan.name, x, y + 25);
+                    ctx.fillStyle = '#ff6b6b';
+                }
+            });
+            
+            // Actual query location
+            const actualX = margin + (currentSelectivity/15) * chartWidth;
+            const actualCost = 50 + Math.pow(currentSelectivity + 0.5, 1.8) * 40;
+            const actualY = canvas.height - margin - actualCost;
+            
+            ctx.fillStyle = '#00ff00';
+            ctx.beginPath();
+            ctx.moveTo(actualX, margin + 20);
+            ctx.lineTo(actualX - 12, margin + 40);
+            ctx.lineTo(actualX + 12, margin + 40);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.fillStyle = '#00ff00';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Actual: ${currentSelectivity.toFixed(1)}%`, actualX, margin + 10);
+            
+            // Traditional optimizer failure
+            ctx.fillStyle = '#ff4444';
+            const estimatedX = margin + (1/15) * chartWidth; // Always estimates 1%
+            ctx.beginPath();
+            ctx.arc(estimatedX, margin + 60, 6, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.fillText('Est: 1%', estimatedX, margin + 80);
+        }
+        
+        function animateDemo() {
+            if (animationRunning) return;
+            animationRunning = true;
+            
+            const logContent = document.getElementById('log-content');
+            logContent.innerHTML = '';
+            
+            const planData = [
+                {x: 2, cost: 100, name: 'P1'},
+                {x: 4, cost: 200, name: 'P2'},
+                {x: 7, cost: 400, name: 'P3'},
+                {x: 12, cost: 800, name: 'P4'}
+            ];
+            
+            let currentPlan = 0;
+            let totalCost = 0;
+            
+            function executeNextPlan() {
+                if (currentPlan >= planData.length || currentSelectivity <= planData[currentPlan].x) {
+                    // Success!
+                    const plan = planData[Math.min(currentPlan, planData.length - 1)];
+                    totalCost += plan.cost;
+                    const optimalCost = 50 + Math.pow(currentSelectivity + 0.5, 1.8) * 40;
+                    const ratio = (totalCost / optimalCost).toFixed(1);
+                    
+                    logContent.innerHTML += `<p><span style="color: #4ecdc4;">✅ SUCCESS!</span> ${plan.name} completed within budget!</p>`;
+                    logContent.innerHTML += `<p><strong>📊 Final Results:</strong><br>
+                        • Total cost: ${totalCost} units<br>
+                        • Optimal cost: ${Math.round(optimalCost)} units<br>
+                        • Performance ratio: ${ratio}x (≤4x guaranteed!)</p>`;
+                    
+                    animationRunning = false;
+                    return;
+                }
+                
+                const plan = planData[currentPlan];
+                totalCost += plan.cost;
+                
+                logContent.innerHTML += `<p><span style="color: #ff6b6b;">❌ Step ${currentPlan + 1}:</span> 
+                    Try ${plan.name} with budget ${plan.cost} units... 
+                    <strong>BUDGET EXCEEDED</strong> (need ${currentSelectivity.toFixed(1)}% selectivity)</p>`;
+                
+                currentPlan++;
+                setTimeout(executeNextPlan, 1500);
+            }
+            
+            logContent.innerHTML = `<p><strong>🚀 Starting Plan Bouquet Algorithm</strong></p>
+                <p>Target: Execute query with ${currentSelectivity.toFixed(1)}% selectivity</p>`;
+            
+            setTimeout(executeNextPlan, 1000);
+        }
+        
+        function resetDemo() {
+            animationRunning = false;
+            if (animationId) cancelAnimationFrame(animationId);
+            
+            const logContent = document.getElementById('log-content');
+            if (logContent) {
+                logContent.innerHTML = 'Adjust the selectivity slider above and run the algorithm to see how Plan Bouquet adapts!';
+            }
+            drawStaticVisualization();
+        }
+    </script>
+</body>
+</html>
